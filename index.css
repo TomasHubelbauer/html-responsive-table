@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+}
+
+.table {
+  border: 1px solid gray;
+}
+
+.table .header {
+  background: gray;
+  color: white;
+}
+
+.table > div {
+  display: flex;
+}
+
+.table > div:not(.header):hover {
+  background: silver;
+}
+
+.table > div > div {
+  flex: 1;
+}
+
+.table > div > div:nth-child(1) {
+  /* Simulate columns of various widths to prove the algorithm works for any width */
+  flex: 0.25;
+}
+
+.table > div > div:nth-child(3) {
+  /* Simulate columns of various widths to prove the algorithm works for any width */
+  flex: 0.5;
+}
+
+#fullWidthTable {
+  margin-bottom: 1em;
+}
+
+#halfWidthTable {
+  margin: auto;
+  width: 50%;
+}
