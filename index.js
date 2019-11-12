@@ -40,18 +40,25 @@ window.addEventListener("load", () => {
     document.getElementById("fullWidthTable"),
     "fullWidth",
     data,
-    headings
+    headings,
+    { 0: 16 + 16 /* Margin */ }
   );
 
   renderTable(
-    document.getElementById("halfWidthTable"),
-    "halfWidth",
+    document.getElementById("partWidthTable"),
+    "partWidthTable",
     data,
-    headings
+    headings,
+    {
+      0: 16 + 16 /* Margin + no pane */,
+      600: 32 + 250 /* Margin + narrow pane */,
+      800: 32 + 400 /* Margin + normal pane */,
+      1000: 32 + 600 /* Margin + wide pane */
+    }
   );
 });
 
-function renderTable(parentElement, key, data, headings) {
+function renderTable(parentElement, key, data, headings, breakpoints) {
   const tableDiv = document.createElement("div");
   tableDiv.className = "table " + key;
 
@@ -86,6 +93,11 @@ function renderTable(parentElement, key, data, headings) {
       headerDiv.children[index++].clientWidth / tableDiv.clientWidth;
   }
 
+  // TODO: Include these in the media query calculation
+  const externalBreakpoints = Object.entries(breakpoints)
+    .map(([k, v]) => [Number(k), v])
+    .sort((a, b) => a[0] - b[0]);
+  console.log(externalBreakpoints);
   const breakpointStyle = document.createElement("style");
   for (const {
     breakpoint: resizedTableWidth,

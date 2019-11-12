@@ -206,3 +206,13 @@ This limitation prohibits this solution from working generically and limits it t
 being useful only in the most basic situations.
 
 - See if the media query styles could be made scoped
+- Finalize the solution with passing dead space to `renderTable`
+
+The solution I am going with (passing in at what breakpoints there is how much)
+dead space around (or should it be to the left?) of the table should work out
+such that for the first, full-width table, the viewport changes directly,
+immediately and linearly affect the table dimensions.
+
+For the second table which has conditional pane, there are regions where the
+linearity has a coefficient which is dependent on the pane dimensions which
+themselves are a subject to the viewport size.

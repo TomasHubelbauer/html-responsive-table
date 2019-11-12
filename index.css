@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 .table {
   border: 1px solid gray;
 }
@@ -30,10 +34,37 @@
 }
 
 #fullWidthTable {
-  margin-bottom: 1em;
+  margin: 1em;
 }
 
-#halfWidthTable {
-  margin: auto;
-  width: 50%;
+#partWidthTable {
+  display: flex;
+  margin: 1em;
+}
+
+#partWidthTable .pane {
+  background: salmon;
+  width: 600px;
+}
+
+@media (max-width: 1000px) {
+  #partWidthTable .pane {
+    width: 400px;
+  }
+}
+
+@media (max-width: 800px) {
+  #partWidthTable .pane {
+    width: 250px;
+  }
+}
+
+@media (max-width: 600px) {
+  #partWidthTable .pane {
+    display: none;
+  }
+}
+
+#partWidthTable .table {
+  flex: 1;
 }
