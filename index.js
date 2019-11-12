@@ -43,14 +43,12 @@ window.addEventListener("load", () => {
     headings
   );
 
-  // This one is broken ATM, see the readme
-  false &&
-    renderTable(
-      document.getElementById("halfWidthTable"),
-      "halfWidth",
-      data,
-      headings
-    );
+  renderTable(
+    document.getElementById("halfWidthTable"),
+    "halfWidth",
+    data,
+    headings
+  );
 });
 
 function renderTable(parentElement, key, data, headings) {

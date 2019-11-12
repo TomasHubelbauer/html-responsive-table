@@ -177,15 +177,32 @@ For this particular scenario, the results are as follows:
 
 ---
 
-I've implemented the above and identified a problem where there is more work to do
-to correctly support tables whose dimensions do not linearly scale with the viewport.
-This is going to be most tables, as expected, but the question remains whether it is
-possible to reliably, programatically, find the points at which the tables dimensions
-start to correspond to the viewport width and stop. This is a potential problem,
-because it is determined by the sizing behavior of all the ancestors of the element in
-the visual DOM tree. There is an option of allowing the user to specify the maximum
-and minimum size explicitly (maybe we just need the maximum), but this might become
-unmaintable quickly as it would link to the CSS ruleset that actually creates that
-value and these two values would quickly go out of sync.
+I've implemented the above and calculating the breakpoints within the table works
+okay and is acceptable. However, the problem is that the target element exists
+within some path on the visual DOM tree which confines it to its maximum dimensions
+and there is no guarantee that the element will scale linearly with the viewport.
+In fact, it most likely won't.
+
+This wouldn't be a problem in simple cases, like the element having only some
+margins, which can be substracted from the viewport size, so that changing the
+viewport by the amount of the margins leaves the table alone and only when the
+margins have been reduced enough that shrinking the browser down further actually
+squeezes the table, the breakpoints kick in.
+
+These edge values are most likely not possible to determine programatically in a
+reliable way, because there is a function which is result of the layout of the
+element and the ones in its visual tree path and this function determines between
+what endpoints of the viewport size is the table element affected and also how
+(because it might not be only linearly).
+
+It might be possible to allow the user to determined these points themselves based
+on the other CSS they author and let them set these values so that this method
+works, but at that point there is a likely disconnect waiting to happen when these
+values are depending on the other CSS but it is impossible to notice when having
+forgotten to change these values after making changes to the CSS. This is a high
+maintenance situation and is likely not worth it for anyone.
+
+This limitation prohibits this solution from working generically and limits it to
+being useful only in the most basic situations.
 
 - See if the media query styles could be made scoped
