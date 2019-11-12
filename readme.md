@@ -2,6 +2,8 @@
 
 For current status, scroll all the way below!
 
+[**LIVE**](https://tomashubelbauer.github.io/html-responsive-table/)
+
 ---
 
 This is a prototype of an HTML component whose behavior is that of a table,
