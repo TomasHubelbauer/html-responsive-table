@@ -116,10 +116,10 @@ This continues as per the algorithm.
 
 | Title | Weight | Limit | Ratio |
 | ----- | ------ | ----- | ----- |
-| 1st   | 4      | 100   | 1     |
-| 2nd   | 3      | 200   | 2     |
-| 3rd   | 2      | 300   | 3     |
-| 4th   | 1      | 400   | 4     |
+| 1st   | 4      | 100   | .1    |
+| 2nd   | 3      | 200   | .2    |
+| 3rd   | 2      | 200   | .3    |
+| 4th   | 1      | 200   | .4    |
 
 The viewport goes from a thousand to a zero. The table has a dead space of
 10 on each side as well as a variable dead space on its left side (simulating
@@ -131,6 +131,97 @@ The pane dead space rules based on the viewport size are:
 - 1000-801 = 400
 - 800-601 = 250
 - 600- = 0
+
+Column sizes adjusted by ratios to make all columns fit:
+
+- 1st: 1 / .1 times 100 = 1000
+- 2nd: 1 / .2 times 200 = 1000
+- 3rd: 1 / .3 times 200 = 666
+- 4th: 1 / .4 times 200 = 500
+
+The fit table width is then a thousand, after this value, columns start to drop.
+
+| Viewport | Table                       | Result      |
+| -------- | --------------------------- | ----------- |
+| 2000     | 2000 - 10 - 600 - 10 = 1380 | Fit (>1000) |
+| 1800     | 1800 - 10 - 600 - 10 = 1180 | Fit (>1000) |
+| 1700     | 1700 - 10 - 600 - 10 = 1080 | Fit (>1000) |
+
+#### 1600
+
+Table 1600 - 10 - 600 - 10 = 980
+
+Doesn't fit (<1000), drop 4th, adjust the rest to 980:
+
+.1 + .2 + .3 = .6
+
+- 1st: .1 / .6 = .16 -> .16 times 980 = 156 fits 100
+- 2nd: .2 / .6 = .33 -> .33 times 980 = 323 fits 200
+- 3rd: .3 / .6 = .5 -> .5 times 980 = 490 fits 200
+
+The rest fits.
+
+#### 1200
+
+Table 1200 - 10 - 600 - 10 = 580
+
+Doesn't fit (<1000), drop 4th, adjust the rest to 580:
+
+.1 + .2 + .3 = .6
+
+- 1st: .1 / .6 = .16 -> .16 times 580 = 92 doesn't fit 100
+- 2nd: .2 / .6 = .33 -> .33 times 580 = 191 doesn't fit 200
+- 3rd: .3 / .6 = .5 -> .5 times 580 = 290 fits 200
+
+The rest doesn't fit, drop 2nd as it has lowest weight and adjust again:
+
+.1 + .3 = .4
+
+- 1st: .1 / .4 = .25 -> .25 times 580 = 145 fits 100
+- 3rd: .3 / .4 = .75 -> .75 times 580 = 435 fits 200
+
+The rest fits.
+
+#### 1000
+
+Table 1000 - 10 - 600 - 10 = 380
+
+Doesn't fit (<1000), drop 4th, adjust the rest to 380:
+
+.1 + .2 + .3 = .6
+
+- 1st: .1 / .6 = .16 -> .16 times 380 = 60 doesn't fit 100
+- 2nd: .2 / .6 = .33 -> .33 times 380 = 125 doesn't fit 200
+- 3rd: .3 / .6 = .5 -> .5 times 380 = 190 doesn't fit 200
+
+The rest doesn't fit, drop 3rd as it has lowest weight and adjust again:
+
+.1 + .2 = .3
+
+- 1st: .1 / .3 = .33 -> .33 times 380 = 125 fits 100
+- 2rd: .2 / .3 = .66 -> .66 times 380 = 250 fits 200
+
+The rest fits.
+
+#### 900
+
+Table 900 - 10 - 400 - 10 = 480
+
+#### 800
+
+Table 800 - 10 - 400 - 10 = 380
+
+#### 700
+
+Table 700 - 10 - 250 - 10 = 430
+
+#### 600
+
+Table 600 - 10 - 250 - 10 = 330
+
+#### 500
+
+Table 500 - 10 - 10 = 480
 
 ## Limitations
 
