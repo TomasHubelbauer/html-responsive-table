@@ -10,6 +10,8 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
 
   // Walk the viewport size down to zero and determine which columns hide or show
   for (let tableWidth = fitTableWidth; tableWidth > 0; tableWidth--) {
+    console.log("round", tableWidth, "deadspace", deadspace(tableWidth));
+
     // Start with all the columns in each viewport dimension and recursively remove the unfitting ones
     const columns = [...tableColumns];
 
@@ -19,7 +21,7 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     // Hoist which column to remove outside of the loop so that we can use it in its condition
     let columnToRemove;
     do {
-      // Reset this
+      // Reset this so that we avoid a false positive in the `while` condition if this is set from last iteration
       columnToRemove = undefined;
 
       // Recalculate the sum total of the ratio excluding the removed columns so the ratios add up to 1
@@ -56,12 +58,27 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
 
     // Notify the caller to remove a column if the candidate for removal has changed since last time
     if (lastColumnToRemove !== lastRoundColumnToRemove) {
+      const debugAdjustedColumnRatioSum = columns.reduce(
+        (a, c) => a + c.ratio,
+        0
+      );
+      const debugMessage =
+        columns
+          .map(c => {
+            const size = Math.round(
+              (c.ratio / debugAdjustedColumnRatioSum) * tableWidth
+            );
+            return `${c.key} (${size}px)`;
+          })
+          .join(", ") +
+        ` deadspace left ${JSON.stringify(deadspace(tableWidth))}`;
+
       yield {
         // Let the caller know what size the table needs to shrink to for this column to stop fitting
         tableBreakpoint: tableWidth,
 
         // Let the caller know what is the corresponding viewport size including dead spaces for the media query
-        viewportBreakpoint: deadspace.left + tableWidth + deadspace.right,
+        viewportBreakpoint: deadspace(tableWidth) + tableWidth,
 
         // Let the caller know which is the latest column to be removed
         hideColumnKey: lastRoundColumnToRemove.key,
@@ -69,7 +86,9 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
         // Let the called know to restore a previously deleted column if there is room for it again
         showColumnKey: columns.includes(lastColumnToRemove)
           ? lastColumnToRemove.key
-          : undefined
+          : undefined,
+
+        debugMessage
       };
 
       // Update the marker of the last removed column to prevent reporting the superseded one again

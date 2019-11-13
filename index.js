@@ -12,7 +12,7 @@ window.addEventListener("load", () => {
       { title: "3rd", key: "third", weight: 2, ratio: 0.4, limit: 75 },
       { title: "4th", key: "fourth", weight: 1, ratio: 0.3, limit: 100 }
     ],
-    { left: 8 /* Body left margin */, right: 8 /* Body right margin */ }
+    () => 8 /* Body left margin */ + 8 /* Body right margin */
   );
 
   const headings = [
@@ -59,7 +59,7 @@ window.addEventListener("load", () => {
     "fullWidth",
     data,
     headings,
-    { left: 8 /* Body left margin */, right: 8 /* Body right margin */ }
+    () => 8 /* Body left margin */ + 8 /* Body right margin */
   );
 
   renderTable(
@@ -67,9 +67,34 @@ window.addEventListener("load", () => {
     "partWidthTable",
     data,
     headings,
-    {
-      left: 600 + 8, // TODO
-      right: 8 // Body right margin
+    viewport => {
+      if (viewport < 600) {
+        return (
+          8 /* Body left margin */ + 0 /* no pane */ + 8 /* Body right margin */
+        );
+      }
+
+      if (viewport < 800) {
+        return (
+          8 /* Body left margin */ +
+          250 /* the pane */ +
+          8 /* Body right margin */
+        );
+      }
+
+      if (viewport < 1000) {
+        return (
+          8 /* Body left margin */ +
+          400 /* the pane */ +
+          8 /* Body right margin */
+        );
+      }
+
+      return (
+        8 /* Body left margin */ +
+        600 /* the pane */ +
+        8 /* Body right margin */
+      );
     }
   );
 });

@@ -186,3 +186,8 @@ Debug the problem with the half width table where the numbers that are supposed
 to accomodate for the border are off.
 
 Make the dead spaces object capture the changing border.
+
+Be smarted about the weights, in the demo table, third should be removed, not
+second, because removing third (which fits but has lower weight) will make
+enough room to fit second again. So we need to do an extra / a better pass to
+include this check.
