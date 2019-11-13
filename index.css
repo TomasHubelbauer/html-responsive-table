@@ -48,23 +48,23 @@
 }
 
 .partWidthTable {
-  border-left: 600px solid salmon;
+  margin-left: 600px;
 }
 
 @media (max-width: 1000px) {
   .partWidthTable {
-    border-left: 400px solid salmon;
+    margin-left: 400px;
   }
 }
 
 @media (max-width: 800px) {
   .partWidthTable {
-    border-left: 250px solid salmon;
+    margin-left: 250px;
   }
 }
 
 @media (max-width: 600px) {
   .partWidthTable {
-    border-left: none;
+    margin-left: 0;
   }
 }

@@ -66,7 +66,7 @@ window.addEventListener("load", () => {
     data,
     headings,
     {
-      left: 0, // TODO
+      left: 600, // TODO
       right: 8 // Body right margin
     }
   );
