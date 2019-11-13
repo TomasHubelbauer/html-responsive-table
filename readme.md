@@ -1,7 +1,5 @@
 # HTML Responsive Table
 
-For current status, scroll all the way below!
-
 [**LIVE**](https://tomashubelbauer.github.io/html-responsive-table/)
 
 This repository contains an HTML responsive table component, which responds
