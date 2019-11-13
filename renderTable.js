@@ -17,6 +17,7 @@ export default function renderTable(
     const headingDiv = document.createElement("div");
     headingDiv.className = heading.key;
     headingDiv.textContent = heading.title;
+    headingDiv.style.flex = heading.ratio;
     headerDiv.append(headingDiv);
   }
 
@@ -28,6 +29,7 @@ export default function renderTable(
       const cellDiv = document.createElement("div");
       cellDiv.className = heading.key;
       cellDiv.textContent = heading.value(item);
+      cellDiv.style.flex = heading.ratio;
       rowDiv.append(cellDiv);
     }
 
@@ -35,13 +37,6 @@ export default function renderTable(
   }
 
   parentElement.replaceWith(tableDiv);
-
-  // TODO: Accept these in props?
-  let index = 0;
-  for (const heading of headings) {
-    heading.ratio =
-      headerDiv.children[index++].clientWidth / tableDiv.clientWidth;
-  }
 
   const breakpointStyle = document.createElement("style");
   for (const {

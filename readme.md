@@ -28,6 +28,8 @@ that point on.
 
 ## Examples
 
+### Table Breakpoints
+
 | Title | Ratio | Weight | Limit |
 | ----- | ----- | ------ | ----- |
 | 1st   | .1    | 0      | 50    |
@@ -65,7 +67,7 @@ the table and the viewport edges.
 | 112-       | 3rd  | 2nd  | 1st, 3rd, 4th      | 2nd                |
 | 49-        | 2nd  |      | 1st, 2nd, 3rd, 4th |                    |
 
----
+### Table Breakpoints and Derived Viewport Breakpoints
 
 | Title | Weight | Limit | Ratio |
 | ----- | ------ | ----- | ----- |
@@ -74,13 +76,61 @@ the table and the viewport edges.
 | 3rd   | 2      | 300   | 3     |
 | 4th   | 1      | 400   | 4     |
 
-The viewport goes from a thousand to a zero.
+The viewport goes from a thousand to a zero. The table has a dead space of
+10 on each side (a margin).
 
 | Table breakpoint | Viewport breakpoint  | Hidden columns |
 | ---------------- | -------------------- | -------------- |
 | 999              | 10 + 999 + 10 = 1019 | 4th            |
 | 599              | 10 + 599 + 10 = 619  | 4th, 3rd       |
 | 299              | 10 + 299 + 10 = 319  | 4th, 3rd, 2nd  |
+
+### Static Dead Space
+
+| Title | Weight | Limit | Ratio |
+| ----- | ------ | ----- | ----- |
+| 1st   | 4      | 100   | 1     |
+| 2nd   | 3      | 200   | 2     |
+| 3rd   | 2      | 300   | 3     |
+| 4th   | 1      | 400   | 4     |
+
+The viewport goes from a thousand to a zero. The table has a dead space of
+10 on each side as well as a static dead space on its left side (simulating
+a pane by the table which also responds to the viewport size changes) of 600.
+
+The first breakpoint will appear after 10 + 600 + (100 + 200 + 300 + 400) + 10
+= 1620. Less than 1620 means that not all columns will fit and the 4th one
+will go as it has the lowest weight.
+
+This continues as per the algorithm.
+
+| Table breakpoint | Viewport breakpoint | Hide | Show | Hidden             | Visible            |
+| ---------------- | ------------------- | ---- | ---- | ------------------ | ------------------ |
+| 1000             |                     |      |      |                    | 1st, 2nd, 3rd, 4th |
+| 999              | 1619                | 4th  |      | 4th                | 1st, 2nd, 3rd      |
+| 599              | 1219                | 3rd  |      | 3rd, 4th           | 1st, 2nd           |
+| 299              | 919                 | 2nd  |      | 2nd, 3rd, 4th      | 1st                |
+| 99               | 719                 | 1st  |      | 1st, 2nd, 3rd, 4th |                    |
+
+### Dynamic Dead Space
+
+| Title | Weight | Limit | Ratio |
+| ----- | ------ | ----- | ----- |
+| 1st   | 4      | 100   | 1     |
+| 2nd   | 3      | 200   | 2     |
+| 3rd   | 2      | 300   | 3     |
+| 4th   | 1      | 400   | 4     |
+
+The viewport goes from a thousand to a zero. The table has a dead space of
+10 on each side as well as a variable dead space on its left side (simulating
+a pane by the table which also responds to the viewport size changes).
+
+The pane dead space rules based on the viewport size are:
+
+- +1000 = 600
+- 1000-801 = 400
+- 800-601 = 250
+- 600- = 0
 
 ## Limitations
 

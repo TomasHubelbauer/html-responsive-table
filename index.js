@@ -1,4 +1,5 @@
 import renderTable from "./renderTable.js";
+import calculateBreakpoints from "./calculateBreakpoints.js";
 
 window.addEventListener("load", () => {
   renderTable(
@@ -16,27 +17,37 @@ window.addEventListener("load", () => {
   );
 
   const headings = [
-    { title: "#", value: i => i.id, weight: 0, limit: 50, key: "id" },
+    {
+      title: "#",
+      value: i => i.id,
+      weight: 0,
+      limit: 50,
+      key: "id",
+      ratio: 0.25
+    },
     {
       title: "First name",
       value: i => i.firstName,
       weight: 1,
       limit: 220,
-      key: "firstName"
+      key: "firstName",
+      ratio: 1
     },
     {
       title: "Last name",
       value: i => i.lastName,
       weight: 0,
       limit: 250,
-      key: "lastName"
+      key: "lastName",
+      ratio: 0.5
     },
     {
       title: "Email address",
       value: i => i.email,
       weight: 2,
       limit: 200,
-      key: "email"
+      key: "email",
+      ratio: 1
     }
   ];
   const data = [
@@ -71,3 +82,16 @@ window.addEventListener("load", () => {
     }
   );
 });
+
+for (const breakpoint of calculateBreakpoints(
+  [
+    { title: "1st", key: "1st", weight: 4, limit: 100, ratio: 1 },
+    { title: "2nd", key: "2nd", weight: 3, limit: 200, ratio: 2 },
+    { title: "3rd", key: "3rd", weight: 2, limit: 300, ratio: 3 },
+    { title: "4th", key: "4th", weight: 1, limit: 400, ratio: 4 }
+  ],
+  { left: 610, right: 10 },
+  1000
+)) {
+  console.log(breakpoint);
+}

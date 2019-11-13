@@ -19,32 +19,8 @@
   flex: 1;
 }
 
-.table > div > div.id {
-  flex: 0.25;
-}
-
-.table > div > div.lastName {
-  flex: 0.5;
-}
-
 .debugTable {
   max-width: 500px;
-}
-
-.debugTable > div > div.first {
-  flex: 0.1;
-}
-
-.debugTable > div > div.second {
-  flex: 0.2;
-}
-
-.debugTable > div > div.third {
-  flex: 0.4;
-}
-
-.debugTable > div > div.fourth {
-  flex: 0.3;
 }
 
 .partWidthTable {
