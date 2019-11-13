@@ -5,9 +5,12 @@ export default function renderTable(
   key,
   data,
   headings,
-  deadspace,
-  overrideViewport
+  deadspace
 ) {
+  if (key !== "partWidthTable") {
+    //return;
+  }
+
   const tableDiv = document.createElement("div");
   tableDiv.className = "table " + key;
 
@@ -16,7 +19,7 @@ export default function renderTable(
   for (const heading of headings) {
     const headingDiv = document.createElement("div");
     headingDiv.className = heading.key;
-    headingDiv.textContent = heading.title;
+    headingDiv.innerHTML = `${heading.title}<br/>${heading.limit}px<br/>${heading.weight}`;
     headingDiv.style.flex = heading.ratio;
     headerDiv.append(headingDiv);
   }
@@ -44,7 +47,7 @@ export default function renderTable(
     viewportBreakpoint,
     hideColumnKey,
     showColumnKey
-  } of calculateBreakpoints(headings, deadspace, overrideViewport)) {
+  } of calculateBreakpoints(headings, deadspace)) {
     let comment = `Hide ${hideColumnKey} at viewport ${viewportBreakpoint}px, table ${tableBreakpoint}px`;
     if (showColumnKey) {
       comment += ` and show ${showColumnKey} again`;
@@ -54,7 +57,7 @@ export default function renderTable(
     breakpoint += `@media (max-width: ${viewportBreakpoint}px) {\n`;
     breakpoint += `  .table.${key} > div > div.${hideColumnKey} { display: none; }\n`;
     if (showColumnKey) {
-      breakpoint += `  .table.${key} > div > div.${hideColumnKey} { display: initial; }\n`;
+      breakpoint += `  .table.${key} > div > div.${showColumnKey} { display: initial; }\n`;
     }
 
     breakpoint += "}";

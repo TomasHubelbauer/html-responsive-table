@@ -12,8 +12,7 @@ window.addEventListener("load", () => {
       { title: "3rd", key: "third", weight: 2, ratio: 0.4, limit: 75 },
       { title: "4th", key: "fourth", weight: 1, ratio: 0.3, limit: 100 }
     ],
-    { left: 8 /* Body left margin */, right: 8 /* Body right margin */ },
-    500
+    { left: 8 /* Body left margin */, right: 8 /* Body right margin */ }
   );
 
   const headings = [
@@ -51,16 +50,8 @@ window.addEventListener("load", () => {
     }
   ];
   const data = [
-    {
-      id: 0,
-      firstName: "Tom",
-      lastName: "Hubelbauer",
-      email: "tomas@hubelbauer.net"
-    },
-    { id: 1, firstName: "John", lastName: "Doe", email: "john@doe.net" },
-    { id: 2, firstName: "Jane", lastName: "Doe", email: "jane@doe.net" },
-    { id: 3, firstName: "Foo", lastName: "Bar", email: "foo@bar.net" },
-    { id: 4, firstName: "Baz", lastName: "Quix", email: "baz@quix.net" }
+    { id: 0, firstName: "John", lastName: "Doe", email: "john@doe.net" },
+    { id: 1, firstName: "Jane", lastName: "Doe", email: "jane@doe.net" }
   ];
 
   renderTable(
@@ -77,21 +68,20 @@ window.addEventListener("load", () => {
     data,
     headings,
     {
-      left: 600, // TODO
+      left: 600 + 8, // TODO
       right: 8 // Body right margin
     }
   );
 });
 
-for (const breakpoint of calculateBreakpoints(
-  [
-    { title: "1st", key: "1st", weight: 4, limit: 100, ratio: 1 },
-    { title: "2nd", key: "2nd", weight: 3, limit: 200, ratio: 2 },
-    { title: "3rd", key: "3rd", weight: 2, limit: 300, ratio: 3 },
-    { title: "4th", key: "4th", weight: 1, limit: 400, ratio: 4 }
-  ],
-  { left: 610, right: 10 },
-  1000
-)) {
-  console.log(breakpoint);
-}
+// for (const breakpoint of calculateBreakpoints(
+//   [
+//     { title: "1st", key: "1st", weight: 4, limit: 100, ratio: 1 },
+//     { title: "2nd", key: "2nd", weight: 3, limit: 200, ratio: 2 },
+//     { title: "3rd", key: "3rd", weight: 2, limit: 300, ratio: 3 },
+//     { title: "4th", key: "4th", weight: 1, limit: 400, ratio: 4 }
+//   ],
+//   { left: 610, right: 10 }
+// )) {
+//   console.log(breakpoint);
+// }

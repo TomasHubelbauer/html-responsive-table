@@ -28,19 +28,19 @@
 }
 
 @media (max-width: 1000px) {
-  .partWidthTable {
+  .partWidthTableTODO {
     margin-left: 400px;
   }
 }
 
 @media (max-width: 800px) {
-  .partWidthTable {
+  .partWidthTableTODO {
     margin-left: 250px;
   }
 }
 
 @media (max-width: 600px) {
-  .partWidthTable {
+  .partWidthTableTODO {
     margin-left: 0;
   }
 }
