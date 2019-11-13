@@ -4,6 +4,10 @@ For current status, scroll all the way below!
 
 [**LIVE**](https://tomashubelbauer.github.io/html-responsive-table/)
 
+## Running
+
+`npx serve .` then access http://localhost:5000.
+
 ---
 
 This is a prototype of an HTML component whose behavior is that of a table,
@@ -175,6 +179,15 @@ For this particular scenario, the results are as follows:
 - From 49 to zero, no columns fit the resized table dimensions
   - Since the lowest limit across the columns is 50, no columns make it
 
+| Breakpoint | Hide | Show | Hidden             | Visible            |
+| ---------- | ---- | ---- | ------------------ | ------------------ |
+| 500+       |      |      |                    | 1st, 2nd, 3rd, 4th |
+| 499-       | 1st  |      | 1st                | 2nd, 3rd, 4th      |
+| 300-       | 4th  |      | 1st, 4th           | 2nd, 3rd           |
+| 149-       | 2nd  |      | 1st, 2nd, 4th      | 3rd                |
+| 112-       | 3rd  | 2nd  | 1st, 3rd, 4th      | 2nd                |
+| 49-        | 2nd  |      | 1st, 2nd, 3rd, 4th |                    |
+
 ---
 
 I've implemented the above and calculating the breakpoints within the table works
@@ -216,3 +229,52 @@ immediately and linearly affect the table dimensions.
 For the second table which has conditional pane, there are regions where the
 linearity has a coefficient which is dependent on the pane dimensions which
 themselves are a subject to the viewport size.
+
+Starting with a simple situation, let's imagine there is a single pane to the
+left of the table which otherwise stretches to the end of the page. This means
+that the table will start scaling with the viewport change immediately, however,
+the left pane's width needs to be taken into an account while scaling.
+
+Should the pane be 200 wide, the table 600 and the viewport itself 800 (we are
+ignoring margins in this example), shrinking the viewport to 700 would cause the
+table to shrink to 500, giving us 200+500=700. The left pane doesn't affect the
+linearity with which the translation occurs, but does it's speed, or slope.
+
+I just realized, that the original table width is completely inconsequential to
+the algorithm, the only thing we need to determine is the ratio of the columns
+to one another (and there is a case to be made for accepting that through the
+props as opposed to deriving it from the column widths on mount, which would
+allow the ratios to be dynamic).
+
+Actually let's restart: the table is full width and the margin is 10px each
+way. The viewport is 1000 which gives table width of 980. The headings have
+ratios of .2 to .4 to .3 to .1. The columns widths then are 196, 392, 294 ans 98.
+
+The table change to breakpoint value calculation should _not_ be that the
+relative change in the viewport size corresponds to a relative change to the
+table size. This would incorrectly include the margins. Instead, we should be
+aware that the margins exist (they are equivalent to the dead space we will
+have with the responsive pane) and count with them.
+
+This means the relative change to the original viewport width - 20 to the new
+viewport width - 20 is the relative change to the table size. Considering an
+original viewport size of 1000 and a table with two columns, both 50 % of its
+width, both with a limit of 300. This means the breakpoint will happen when
+the table reaches the width of 600, which will happen when the viewport width
+becomes 620. So this is possible to derive from the sum of column limits.
+
+| Title | Weight | Limit | Ratio |
+| ----- | ------ | ----- | ----- |
+| 1st   | 4      | 100   | 1     |
+| 2nd   | 3      | 200   | 2     |
+| 3rd   | 2      | 300   | 3     |
+| 4th   | 1      | 400   | 4     |
+
+| Table breakpoint | Viewport breakpoint  | Hidden columns |
+| ---------------- | -------------------- | -------------- |
+| 999              | 10 + 999 + 10 = 1019 | 4th            |
+| 599              | 10 + 599 + 10 = 619  | 4th, 3rd       |
+| 299              | 10 + 299 + 10 = 319  | 4th, 3rd, 2nd  |
+
+- See if we need to repeat the previously hidden columns or if the mq will
+  hide them cascadingly

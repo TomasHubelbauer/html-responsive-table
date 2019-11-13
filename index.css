@@ -1,7 +1,3 @@
-body {
-  margin: 0;
-}
-
 .table {
   border: 1px solid gray;
 }
@@ -23,48 +19,52 @@ body {
   flex: 1;
 }
 
-.table > div > div:nth-child(1) {
-  /* Simulate columns of various widths to prove the algorithm works for any width */
+.table > div > div.id {
   flex: 0.25;
 }
 
-.table > div > div:nth-child(3) {
-  /* Simulate columns of various widths to prove the algorithm works for any width */
+.table > div > div.lastName {
   flex: 0.5;
 }
 
-#fullWidthTable {
-  margin: 1em;
+.debugTable {
+  max-width: 500px;
 }
 
-#partWidthTable {
-  display: flex;
-  margin: 1em;
+.debugTable > div > div.first {
+  flex: 0.1;
 }
 
-#partWidthTable .pane {
-  background: salmon;
-  width: 600px;
+.debugTable > div > div.second {
+  flex: 0.2;
+}
+
+.debugTable > div > div.third {
+  flex: 0.4;
+}
+
+.debugTable > div > div.fourth {
+  flex: 0.3;
+}
+
+.partWidthTable {
+  border-left: 600px solid salmon;
 }
 
 @media (max-width: 1000px) {
-  #partWidthTable .pane {
-    width: 400px;
+  .partWidthTable {
+    border-left: 400px solid salmon;
   }
 }
 
 @media (max-width: 800px) {
-  #partWidthTable .pane {
-    width: 250px;
+  .partWidthTable {
+    border-left: 250px solid salmon;
   }
 }
 
 @media (max-width: 600px) {
-  #partWidthTable .pane {
-    display: none;
+  .partWidthTable {
+    border-left: none;
   }
-}
-
-#partWidthTable .table {
-  flex: 1;
 }
