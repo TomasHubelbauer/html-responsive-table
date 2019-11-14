@@ -1,6 +1,12 @@
+const useNewVersion = false;
+
 export default function* calculateBreakpoints(tableColumns, deadspace) {
+  // TODO: Finalize this optimal solution
   // Keep track of the column which was reported for removal last so we don't report it again
   let lastColumnToRemove;
+
+  // TODO: Remove this non-optimal solution
+  let breakpoint;
 
   // Calculate the size above which there can be no breakpoint because all columns fit and go from there
   const columnRatioSum = tableColumns.reduce((a, c) => a + c.ratio, 0);
@@ -8,11 +14,15 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     ...tableColumns.map(c => (columnRatioSum / c.ratio) * c.limit)
   );
 
+  //console.log("fit table width", fitTableWidth);
+
   // Calculate a viewport size which fits the fit table size to start from
   const fitViewportWidth = viewportWidthFromTableWidth(
     fitTableWidth,
     deadspace
   );
+
+  //console.log("fit viewport width", fitViewportWidth);
 
   // Walk the viewport size down to zero and determine which columns hide or show
   for (
@@ -21,7 +31,7 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     viewportWidth--
   ) {
     let tableWidth = tableWidthFromViewportWidth(viewportWidth, deadspace);
-    //console.log("viewport", viewportWidth, "table", tableWidth, fitTableWidth);
+    //console.log("viewport", viewportWidth, "table", tableWidth);
 
     // Start with all the columns in each viewport dimension and recursively remove the unfitting ones
     const columns = [...tableColumns];
@@ -67,18 +77,40 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
       // Continue if we find a non-fitting column if any to recalculate the remaining columns' fit
     } while (columnToRemove);
 
+    const visibleColumns = columns.map(c => c.key).join();
+    if (!useNewVersion && breakpoint !== visibleColumns) {
+      if (columns.length < tableColumns.length) {
+        yield {
+          useNewVersion,
+          tableBreakpoint: tableWidth,
+          viewportBreakpoint: viewportWidth,
+          columns: tableColumns.map(c => ({
+            key: c.key,
+            status: columns.includes(c) ? "visible" : "hidden"
+          }))
+        };
+      }
+
+      breakpoint = visibleColumns;
+    }
+
+    // TODO: Finalize this version which correctly reports only show/hide changes and not all columns
     // Notify the caller to remove a column if the candidate for removal has changed since last time
-    if (lastColumnToRemove !== lastRoundColumnToRemove) {
+    if (useNewVersion && lastColumnToRemove !== lastRoundColumnToRemove) {
       yield {
+        useNewVersion,
+
         // Let the caller know what size the table needs to shrink to for this column to stop fitting
         tableBreakpoint: tableWidth,
 
         // Let the caller know what is the corresponding viewport size including dead spaces for the media query
         viewportBreakpoint: viewportWidth,
 
+        // TODO: Restore this optimized solution
         // Let the caller know which is the latest column to be removed
         hideColumnKey: lastRoundColumnToRemove.key,
 
+        // TODO: Restore this optimized solution
         // Let the called know to restore a previously deleted column if there is room for it again
         showColumnKey: columns.includes(lastColumnToRemove)
           ? lastColumnToRemove.key

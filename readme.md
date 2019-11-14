@@ -280,7 +280,11 @@ space breakpoint.
 ## To-Do
 
 Fix the bug with the part width table where the code currently throws an
-error.
+error in the new version.
+
+Finalize the currently buggy new version which only reports visibility
+changes and get rid of the old version which for each breakpoint reports
+the visibility of all columns.
 
 Be smarted about the weights, in the demo table, third should be removed, not
 second, because removing third (which fits but has lower weight) will make
