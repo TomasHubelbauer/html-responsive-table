@@ -286,3 +286,10 @@ Be smarted about the weights, in the demo table, third should be removed, not
 second, because removing third (which fits but has lower weight) will make
 enough room to fit second again. So we need to do an extra / a better pass to
 include this check.
+
+See if there is a way to instead of iterating all the possible viewport sizes
+derive the exact breakpoint values numerically. Some sort of a dynamic
+programming exercise or something. We don't need the exact values because the
+layout engine will round them up to an integer anyway, but we should still
+pursue this, because it will allow us to get rid of the iteration and only
+enumerate the actual change points.
