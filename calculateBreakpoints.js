@@ -8,9 +8,20 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     ...tableColumns.map(c => (columnRatioSum / c.ratio) * c.limit)
   );
 
+  // Calculate a viewport size which fits the fit table size to start from
+  const fitViewportWidth = viewportWidthFromTableWidth(
+    fitTableWidth,
+    deadspace
+  );
+
   // Walk the viewport size down to zero and determine which columns hide or show
-  for (let tableWidth = fitTableWidth; tableWidth > 0; tableWidth--) {
-    console.log("round", tableWidth, "deadspace", deadspace(tableWidth));
+  for (
+    let viewportWidth = fitViewportWidth;
+    viewportWidth > 0;
+    viewportWidth--
+  ) {
+    let tableWidth = tableWidthFromViewportWidth(viewportWidth, deadspace);
+    //console.log("viewport", viewportWidth, "table", tableWidth, fitTableWidth);
 
     // Start with all the columns in each viewport dimension and recursively remove the unfitting ones
     const columns = [...tableColumns];
@@ -58,27 +69,12 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
 
     // Notify the caller to remove a column if the candidate for removal has changed since last time
     if (lastColumnToRemove !== lastRoundColumnToRemove) {
-      const debugAdjustedColumnRatioSum = columns.reduce(
-        (a, c) => a + c.ratio,
-        0
-      );
-      const debugMessage =
-        columns
-          .map(c => {
-            const size = Math.round(
-              (c.ratio / debugAdjustedColumnRatioSum) * tableWidth
-            );
-            return `${c.key} (${size}px)`;
-          })
-          .join(", ") +
-        ` deadspace left ${JSON.stringify(deadspace(tableWidth))}`;
-
       yield {
         // Let the caller know what size the table needs to shrink to for this column to stop fitting
         tableBreakpoint: tableWidth,
 
         // Let the caller know what is the corresponding viewport size including dead spaces for the media query
-        viewportBreakpoint: deadspace(tableWidth) + tableWidth,
+        viewportBreakpoint: viewportWidth,
 
         // Let the caller know which is the latest column to be removed
         hideColumnKey: lastRoundColumnToRemove.key,
@@ -86,13 +82,62 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
         // Let the called know to restore a previously deleted column if there is room for it again
         showColumnKey: columns.includes(lastColumnToRemove)
           ? lastColumnToRemove.key
-          : undefined,
-
-        debugMessage
+          : undefined
       };
 
       // Update the marker of the last removed column to prevent reporting the superseded one again
       lastColumnToRemove = lastRoundColumnToRemove;
     }
   }
+}
+
+function viewportWidthFromTableWidth(tableWidth, deadspaces) {
+  if (typeof deadspaces === "number") {
+    return tableWidth + deadspaces;
+  }
+
+  if (typeof deadspaces !== "object") {
+    throw new Error("Deadspace must be an object or a number!");
+  }
+
+  let breakpointDeadspace;
+  for (const [breakpoint, deadspace] of Object.entries(deadspaces)) {
+    if (breakpoint === "_") {
+      breakpointDeadspace = deadspace;
+      break;
+    }
+
+    if (tableWidth < Number(breakpoint) - deadspace) {
+      break;
+    }
+
+    breakpointDeadspace = deadspace;
+  }
+
+  return tableWidth + breakpointDeadspace;
+}
+
+function tableWidthFromViewportWidth(viewportWidth, deadspaces) {
+  if (typeof deadspaces === "number") {
+    return viewportWidth - deadspaces;
+  }
+
+  if (typeof deadspaces !== "object") {
+    throw new Error("Deadspace must be an object or a number!");
+  }
+
+  let tableWidth;
+  for (const [breakpoint, deadspace] of Object.entries(deadspaces)) {
+    if (breakpoint === "_") {
+      return viewportWidth - deadspace;
+    }
+
+    if (viewportWidth < Number(breakpoint)) {
+      break;
+    }
+
+    tableWidth = viewportWidth - deadspace;
+  }
+
+  return tableWidth;
 }

@@ -7,10 +7,6 @@ export default function renderTable(
   headings,
   deadspace
 ) {
-  if (key !== "partWidthTable") {
-    return;
-  }
-
   const tableDiv = document.createElement("div");
   tableDiv.className = "table " + key;
 
@@ -46,15 +42,12 @@ export default function renderTable(
     tableBreakpoint,
     viewportBreakpoint,
     hideColumnKey,
-    showColumnKey,
-    debugMessage
+    showColumnKey
   } of calculateBreakpoints(headings, deadspace)) {
     let comment = `Hide ${hideColumnKey} at viewport ${viewportBreakpoint}px, table ${tableBreakpoint}px`;
     if (showColumnKey) {
       comment += ` and show ${showColumnKey} again`;
     }
-
-    comment += ` | ${debugMessage}`;
 
     let breakpoint = `/* ${comment} */\n`;
     breakpoint += `@media (max-width: ${viewportBreakpoint}px) {\n`;

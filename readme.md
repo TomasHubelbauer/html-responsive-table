@@ -271,12 +271,16 @@ We can calculate the minimal size according to each columns ratio and limit:
 
 The highest value is 500 and that's where we need to start.
 
+This is further complicated by tables with dynamic deadspaces where we on
+top of the table width to start at need to also find a viewport width that
+is able to accomodate the fit table and start from that viewport width
+working down, calculating the table width according to the changing dead
+space breakpoint.
+
 ## To-Do
 
-Debug the problem with the half width table where the numbers that are supposed
-to accomodate for the border are off.
-
-Make the dead spaces object capture the changing border.
+Fix the bug with the part width table where the code currently throws an
+error.
 
 Be smarted about the weights, in the demo table, third should be removed, not
 second, because removing third (which fits but has lower weight) will make

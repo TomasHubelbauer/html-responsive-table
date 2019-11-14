@@ -1,5 +1,4 @@
 import renderTable from "./renderTable.js";
-import calculateBreakpoints from "./calculateBreakpoints.js";
 
 window.addEventListener("load", () => {
   renderTable(
@@ -12,7 +11,7 @@ window.addEventListener("load", () => {
       { title: "3rd", key: "third", weight: 2, ratio: 0.4, limit: 75 },
       { title: "4th", key: "fourth", weight: 1, ratio: 0.3, limit: 100 }
     ],
-    () => 8 /* Body left margin */ + 8 /* Body right margin */
+    16 // Body margin
   );
 
   const headings = [
@@ -59,7 +58,7 @@ window.addEventListener("load", () => {
     "fullWidth",
     data,
     headings,
-    () => 8 /* Body left margin */ + 8 /* Body right margin */
+    16 // Body margin
   );
 
   renderTable(
@@ -67,46 +66,11 @@ window.addEventListener("load", () => {
     "partWidthTable",
     data,
     headings,
-    viewport => {
-      if (viewport < 600) {
-        return (
-          8 /* Body left margin */ + 0 /* no pane */ + 8 /* Body right margin */
-        );
-      }
-
-      if (viewport < 800) {
-        return (
-          8 /* Body left margin */ +
-          250 /* the pane */ +
-          8 /* Body right margin */
-        );
-      }
-
-      if (viewport < 1000) {
-        return (
-          8 /* Body left margin */ +
-          400 /* the pane */ +
-          8 /* Body right margin */
-        );
-      }
-
-      return (
-        8 /* Body left margin */ +
-        600 /* the pane */ +
-        8 /* Body right margin */
-      );
+    {
+      600: 16, // No pane, just body margin
+      800: 16 + 250, // Narrow pane and body margin
+      1000: 16 + 400, // Middle pane and body margin
+      _: 16 + 600 // Wide pane and body margin
     }
   );
 });
-
-// for (const breakpoint of calculateBreakpoints(
-//   [
-//     { title: "1st", key: "1st", weight: 4, limit: 100, ratio: 1 },
-//     { title: "2nd", key: "2nd", weight: 3, limit: 200, ratio: 2 },
-//     { title: "3rd", key: "3rd", weight: 2, limit: 300, ratio: 3 },
-//     { title: "4th", key: "4th", weight: 1, limit: 400, ratio: 4 }
-//   ],
-//   { left: 610, right: 10 }
-// )) {
-//   console.log(breakpoint);
-// }
