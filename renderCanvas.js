@@ -20,36 +20,47 @@ canvas.width = limit;
 canvas.height = limit;
 const context = canvas.getContext("2d");
 
-// TODO: Generalize this to be able to play with multiple breakpoints (more dimensions) than just one
-for (let breakpoint = 0; breakpoint < limit; breakpoint++) {
-  document.title = ((breakpoint / limit) * 100).toFixed(0) + "%";
+document.getElementById("test").addEventListener("click", async () => {
+  document.body.replaceChild(canvas, document.getElementById("test"));
 
-  for (let deadspace = 0; deadspace < limit; deadspace++) {
-    const breakpoints = [
-      ...calculateBreakpoints(columns, { [breakpoint * 5]: deadspace * 5 })
-    ];
-    const unique = breakpoints
-      .map(b =>
-        b.columns
-          .filter(c => c.status === "visible")
-          .map(c => c.key)
-          .join()
-      )
-      .join("|");
+  // TODO: Generalize this to be able to play with multiple breakpoints (more dimensions) than just one
+  for (let breakpoint = 0; breakpoint < limit; breakpoint++) {
+    document.title = ((breakpoint / limit) * 100).toFixed(0) + "%";
 
-    let index = uniques.indexOf(unique);
-    if (index === -1) {
-      uniques.push(unique);
-      index = uniques.length - 1;
-      console.log(unique, breakpoint * 5, deadspace * 5);
+    for (let deadspace = 0; deadspace < limit; deadspace++) {
+      const breakpoints = [
+        ...calculateBreakpoints(columns, { [breakpoint * 5]: deadspace * 5 })
+      ];
+      const unique = breakpoints
+        .map(b =>
+          b.columns
+            .filter(c => c.status === "visible")
+            .map(c => c.key)
+            .join()
+        )
+        .join("|");
+
+      let index = uniques.indexOf(unique);
+      if (index === -1) {
+        uniques.push(unique);
+        index = uniques.length - 1;
+        console.log(
+          unique,
+          breakpoint * 5,
+          deadspace * 5,
+          ((breakpoint / limit) * 100).toFixed(0) + "%"
+        );
+      }
+
+      // Use 2x2 to prevent antialiasing artifacts
+      // TODO: Do this using the canvas properties instead
+      context.fillStyle = palette[index];
+      context.fillRect(breakpoint, deadspace, 2, 2);
     }
 
-    // Use 2x2 to prevent antialiasing artifacts
-    // TODO: Do this using the canvas properties instead
-    context.fillStyle = palette[index];
-    context.fillRect(breakpoint, deadspace, 2, 2);
+    // Allow the main thread to redraw the canvas
+    await new Promise(resolve => setTimeout(resolve, 0));
   }
-}
 
-console.log("Done.");
-document.body.append(canvas);
+  console.log("Done.");
+});
