@@ -1,3 +1,7 @@
+import calculateFit from "./calculateFit.js";
+import deriveViewportFromTable from "./deriveViewportFromTable.js";
+import deriveTableFromViewport from "./deriveTableFromViewport.js";
+
 const useNewVersion = false;
 
 export default function* calculateBreakpoints(tableColumns, deadspace) {
@@ -9,20 +13,10 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
   let breakpoint;
 
   // Calculate the size above which there can be no breakpoint because all columns fit and go from there
-  const columnRatioSum = tableColumns.reduce((a, c) => a + c.ratio, 0);
-  const fitTableWidth = Math.max(
-    ...tableColumns.map(c => (columnRatioSum / c.ratio) * c.limit)
-  );
-
-  //console.log("fit table width", fitTableWidth);
+  const fitTableWidth = calculateFit(tableColumns);
 
   // Calculate a viewport size which fits the fit table size to start from
-  const fitViewportWidth = viewportWidthFromTableWidth(
-    fitTableWidth,
-    deadspace
-  );
-
-  //console.log("fit viewport width", fitViewportWidth);
+  const fitViewportWidth = deriveViewportFromTable(fitTableWidth, deadspace);
 
   // Walk the viewport size down to zero and determine which columns hide or show
   for (
@@ -30,7 +24,7 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     viewportWidth > 0;
     viewportWidth--
   ) {
-    let tableWidth = tableWidthFromViewportWidth(viewportWidth, deadspace);
+    let tableWidth = deriveTableFromViewport(viewportWidth, deadspace);
     //console.log("viewport", viewportWidth, "table", tableWidth);
 
     // Start with all the columns in each viewport dimension and recursively remove the unfitting ones
@@ -121,55 +115,4 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
       lastColumnToRemove = lastRoundColumnToRemove;
     }
   }
-}
-
-function viewportWidthFromTableWidth(tableWidth, deadspaces) {
-  if (typeof deadspaces === "number") {
-    return tableWidth + deadspaces;
-  }
-
-  if (typeof deadspaces !== "object") {
-    throw new Error("Deadspace must be an object or a number!");
-  }
-
-  let breakpointDeadspace;
-  for (const [breakpoint, deadspace] of Object.entries(deadspaces)) {
-    if (breakpoint === "_") {
-      breakpointDeadspace = deadspace;
-      break;
-    }
-
-    if (tableWidth < Number(breakpoint) - deadspace) {
-      break;
-    }
-
-    breakpointDeadspace = deadspace;
-  }
-
-  return tableWidth + breakpointDeadspace;
-}
-
-function tableWidthFromViewportWidth(viewportWidth, deadspaces) {
-  if (typeof deadspaces === "number") {
-    return viewportWidth - deadspaces;
-  }
-
-  if (typeof deadspaces !== "object") {
-    throw new Error("Deadspace must be an object or a number!");
-  }
-
-  let tableWidth;
-  for (const [breakpoint, deadspace] of Object.entries(deadspaces)) {
-    if (breakpoint === "_") {
-      return viewportWidth - deadspace;
-    }
-
-    if (viewportWidth < Number(breakpoint)) {
-      break;
-    }
-
-    tableWidth = viewportWidth - deadspace;
-  }
-
-  return tableWidth;
 }

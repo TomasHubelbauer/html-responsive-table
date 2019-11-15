@@ -306,4 +306,32 @@ after having disappeared. Maybe brute-force the most interesting values by
 choosing random deadspace breakpoints and seeing how many breakpoints the
 algorithm yields for each of them and then selecting the one with the most
 yielded breakpoints, doing that for 1 random breakpoint, 2 random breakpoins,
-etc.
+etc.:
+
+```js
+const columns = [];
+const limit = deriveViewportFromTable(calculateFit());
+let highestBreakpointCount = 0;
+let highestBreakpointDeadspace;
+for (
+  let deadspaceBreakpoint = 0;
+  deadspaceBreakpoint < limit;
+  deadSpaceBreakpoint++
+) {
+  for (let deadspaceValue = 0; deadspaceValue < limit; deadspaceValue++) {
+    const deadspace = { [deadspaceBreakpoint]: deadspaceValue };
+    const breakpoints = [...calculateBreakpoints(columns, deadspace)];
+    if (breakpoints.length > highestBreakpointCount) {
+      highestBreakpointCount = breakpoints.length;
+      highestBreakpointDeadspace = deadspace;
+    }
+  }
+}
+
+// Use the config in `highestBreakpointDeadspace` in a test
+// Adopt it to sweep through two deadspace breakpoints, not just one and
+// see if it yields a more interesting test
+```
+
+Remove the Examples section instead pointing the reader to the `test` folder
+with the documented test harnesses.
