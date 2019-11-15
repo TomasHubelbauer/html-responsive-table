@@ -2,7 +2,7 @@ import calculateBreakpoints from "./calculateBreakpoints.js";
 
 const tests = [
   {
-    title: "Constant dead space 1",
+    title: "Static deadspace",
     columns: [
       { key: 1, ratio: 0.1, limit: 50, weight: 0 },
       { key: 2, ratio: 0.2, limit: 50, weight: 3 },
@@ -16,6 +16,24 @@ const tests = [
       { viewport: 165, table: 149, columns: { 3: 149 } },
       { viewport: 128, table: 112, columns: { 2: 112 } },
       { viewport: 65, table: 49, columns: {} }
+    ]
+  },
+  {
+    title: "Dynamic deadspace",
+    columns: [
+      { key: 1, ratio: 0.1, limit: 100, weight: 4 },
+      { key: 2, ratio: 0.2, limit: 150, weight: 2 },
+      { key: 3, ratio: 0.4, limit: 200, weight: 3 },
+      { key: 4, ratio: 0.3, limit: 150, weight: 1 }
+    ],
+    deadspace: {
+      300: 116,
+      _: 16
+    },
+    breakpoints: [
+      { viewport: 0, table: 0, columns: {} },
+      { viewport: 0, table: 0, columns: {} },
+      { viewport: 0, table: 0, columns: {} }
     ]
   }
 ];
@@ -38,6 +56,7 @@ for (const test of tests) {
     const breakpoint = breakpoints[index];
     if (!breakpoints) {
       console.log(`Missing expected breakpoint #${index + 1}`);
+      testErrors++;
       continue;
     }
 
@@ -54,6 +73,7 @@ for (const test of tests) {
           breakpoint.viewportBreakpoint
         }`
       );
+      testErrors++;
     }
 
     if (breakpoint.tableBreakpoint !== testBreakpoint.table) {
@@ -62,6 +82,7 @@ for (const test of tests) {
           testBreakpoint.table
         }px for breakpoint #${index + 1}, but got ${breakpoint.tableBreakpoint}`
       );
+      testErrors++;
     }
 
     const columns = breakpoint.columns.filter(c => c.status === "visible");
@@ -72,6 +93,7 @@ for (const test of tests) {
             Object.keys(testBreakpoint.columns).length
           } columns, but got zero`
         );
+        testErrors++;
       }
 
       console.groupEnd();
@@ -91,6 +113,7 @@ for (const test of tests) {
           console.log(
             `Expected column ${column.key} to be hidden, but it is visible`
           );
+          testErrors++;
         }
 
         continue;
@@ -105,6 +128,7 @@ for (const test of tests) {
         console.log(
           `Expected column to have size ${testColumn}, but got ${columnWidth}`
         );
+        testErrors++;
       }
     }
 
@@ -116,6 +140,7 @@ for (const test of tests) {
       console.log(
         `Expected the column size sum total ${columnsTotal} to add up to the table size ${testBreakpoint.table} but it did not`
       );
+      testErrors++;
     }
 
     // TODO: Consider testing the deadspace as well, probably test whether the deadspace resulting
