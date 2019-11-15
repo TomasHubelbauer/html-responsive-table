@@ -308,7 +308,13 @@ for each unique path from all columns to one or no columns. Extend this further
 to be able to sweep the range with two breakpoints (and the full possible extent
 of their values) or more. Take into the account that with multiple breakpoints,
 ordering logic will result in the subsequent breakpoints' ranges being reduced
-compared to the previous.
+compared to the previous. Ultimately something like `deriveDeadspacesFromColumns`
+should be the result of this work and the results of that function should
+yield exemplary unit test values.
+
+Play around with swapping the order of breakpoint and value in `renderCanvas`
+and see if the picture comes out rotated. Also play around with going from
+limit to zero not zero to limit and see what that does.
 
 Remove the Examples section instead pointing the reader to the `test` folder
 with the documented test harnesses.
