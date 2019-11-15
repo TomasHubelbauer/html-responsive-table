@@ -1,42 +1,8 @@
+import staticDeadspace from "./test/staticDeadspace.js";
+import dynamicDeadspace from "./test/dynamicDeadspace.js";
 import calculateBreakpoints from "./calculateBreakpoints.js";
 
-const tests = [
-  {
-    title: "Static deadspace",
-    columns: [
-      { key: 1, ratio: 0.1, limit: 50, weight: 0 },
-      { key: 2, ratio: 0.2, limit: 50, weight: 3 },
-      { key: 3, ratio: 0.4, limit: 75, weight: 2 },
-      { key: 4, ratio: 0.3, limit: 100, weight: 1 }
-    ],
-    deadspace: 16,
-    breakpoints: [
-      { viewport: 515, table: 499, columns: { 2: 110, 3: 221, 4: 166 } },
-      { viewport: 316, table: 300, columns: { 2: 100, 3: 200 } },
-      { viewport: 165, table: 149, columns: { 3: 149 } },
-      { viewport: 128, table: 112, columns: { 2: 112 } },
-      { viewport: 65, table: 49, columns: {} }
-    ]
-  },
-  {
-    title: "Dynamic deadspace",
-    columns: [
-      { key: 1, ratio: 0.1, limit: 100, weight: 4 },
-      { key: 2, ratio: 0.2, limit: 150, weight: 2 },
-      { key: 3, ratio: 0.4, limit: 200, weight: 3 },
-      { key: 4, ratio: 0.3, limit: 150, weight: 1 }
-    ],
-    deadspace: {
-      300: 116,
-      _: 16
-    },
-    breakpoints: [
-      { viewport: 0, table: 0, columns: {} },
-      { viewport: 0, table: 0, columns: {} },
-      { viewport: 0, table: 0, columns: {} }
-    ]
-  }
-];
+const tests = [staticDeadspace, dynamicDeadspace];
 
 const rounds = 10;
 let errors = 0;
@@ -169,4 +135,6 @@ for (const test of tests) {
 
 if (errors) {
   console.warn(`Found ${errors} total errors!`);
+} else {
+  console.log(`All ${tests.length} tests have passed.`);
 }

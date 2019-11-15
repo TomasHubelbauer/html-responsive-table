@@ -297,3 +297,13 @@ programming exercise or something. We don't need the exact values because the
 layout engine will round them up to an integer anyway, but we should still
 pursue this, because it will allow us to get rid of the iteration and only
 enumerate the actual change points.
+
+Finalize documenting the expected values in the tests for both the static and
+the dynamic deadspace tests.
+
+Add a test where the deadspace is calculated so that some columns reappear
+after having disappeared. Maybe brute-force the most interesting values by
+choosing random deadspace breakpoints and seeing how many breakpoints the
+algorithm yields for each of them and then selecting the one with the most
+yielded breakpoints, doing that for 1 random breakpoint, 2 random breakpoins,
+etc.
