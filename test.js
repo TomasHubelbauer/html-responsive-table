@@ -67,20 +67,14 @@ for (const test of tests) {
 
     if (breakpoint.viewportBreakpoint !== testBreakpoint.viewport) {
       console.log(
-        `Expected viewport size of ${
-          testBreakpoint.viewport
-        }px for breakpoint #${index + 1}, but got ${
-          breakpoint.viewportBreakpoint
-        }`
+        `Expected viewport size of ${testBreakpoint.viewport}px, but got ${breakpoint.viewportBreakpoint}`
       );
       testErrors++;
     }
 
     if (breakpoint.tableBreakpoint !== testBreakpoint.table) {
       console.log(
-        `Expected table size of ${
-          testBreakpoint.table
-        }px for breakpoint #${index + 1}, but got ${breakpoint.tableBreakpoint}`
+        `Expected table size of ${testBreakpoint.table}px, but got ${breakpoint.tableBreakpoint}`
       );
       testErrors++;
     }
