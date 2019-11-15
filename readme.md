@@ -301,37 +301,14 @@ enumerate the actual change points.
 Finalize documenting the expected values in the tests for both the static and
 the dynamic deadspace tests.
 
-Add a test where the deadspace is calculated so that some columns reappear
-after having disappeared. Maybe brute-force the most interesting values by
-choosing random deadspace breakpoints and seeing how many breakpoints the
-algorithm yields for each of them and then selecting the one with the most
-yielded breakpoints, doing that for 1 random breakpoint, 2 random breakpoins,
-etc.:
-
-```js
-const columns = [];
-const limit = deriveViewportFromTable(calculateFit());
-let highestBreakpointCount = 0;
-let highestBreakpointDeadspace;
-for (
-  let deadspaceBreakpoint = 0;
-  deadspaceBreakpoint < limit;
-  deadSpaceBreakpoint++
-) {
-  for (let deadspaceValue = 0; deadspaceValue < limit; deadspaceValue++) {
-    const deadspace = { [deadspaceBreakpoint]: deadspaceValue };
-    const breakpoints = [...calculateBreakpoints(columns, deadspace)];
-    if (breakpoints.length > highestBreakpointCount) {
-      highestBreakpointCount = breakpoints.length;
-      highestBreakpointDeadspace = deadspace;
-    }
-  }
-}
-
-// Use the config in `highestBreakpointDeadspace` in a test
-// Adopt it to sweep through two deadspace breakpoints, not just one and
-// see if it yields a more interesting test
-```
+Advance `renderCanvas` to find `limit` from the columns and iterate all the
+possible breakpoint values within that limit and then all the possible values
+of that breakpoint within that limit and report the first breakpoint-value pair
+for each unique path from all columns to one or no columns. Extend this further
+to be able to sweep the range with two breakpoints (and the full possible extent
+of their values) or more. Take into the account that with multiple breakpoints,
+ordering logic will result in the subsequent breakpoints' ranges being reduced
+compared to the previous.
 
 Remove the Examples section instead pointing the reader to the `test` folder
 with the documented test harnesses.
