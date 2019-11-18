@@ -87,7 +87,7 @@ export default function* calculateBreakpoints(
     if (!useNewVersion && breakpoint !== visibleColumns) {
       if (columns.length < tableColumns.length) {
         yield {
-          useNewVersion,
+          version: 0,
           tableBreakpoint: tableWidth,
           viewportBreakpoint: viewportWidth,
           columns: tableColumns.map(c => ({
@@ -104,7 +104,7 @@ export default function* calculateBreakpoints(
     // Notify the caller to remove a column if the candidate for removal has changed since last time
     if (useNewVersion && lastColumnToRemove !== lastRoundColumnToRemove) {
       yield {
-        useNewVersion,
+        version: 1,
 
         // Let the caller know what size the table needs to shrink to for this column to stop fitting
         tableBreakpoint: tableWidth,

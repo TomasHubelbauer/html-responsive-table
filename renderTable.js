@@ -1,4 +1,4 @@
-import calculateBreakpoints from "./calculateBreakpoints2.js";
+import calculateBreakpoints from "./calculateBreakpoints.js";
 
 export default function renderTable(
   /** @type {HTMLElement} */
@@ -43,50 +43,83 @@ export default function renderTable(
   parentElement.replaceWith(tableDiv);
 
   const breakpointStyle = document.createElement("style");
-  for (const {
-    useNewVersion,
-    columns,
-    tableBreakpoint,
-    viewportBreakpoint,
-    hideColumnKey,
-    showColumnKey
-  } of calculateBreakpoints(headings, deadspace)) {
-    if (useNewVersion) {
-      let comment = `Hide ${hideColumnKey} at viewport ${viewportBreakpoint}px, table ${tableBreakpoint}px`;
-      if (showColumnKey) {
-        comment += ` and show ${showColumnKey} again`;
+  for (const breakpoint of calculateBreakpoints(headings, deadspace)) {
+    switch (breakpoint.version) {
+      case 0: {
+        const comment = `viewport ${breakpoint.viewportBreakpoint} | table ${
+          breakpoint.tableBreakpoint
+        } | ${breakpoint.columns.map(c => c.key + " " + c.status).join(" | ")}`;
+        let mediaQuery = `/* ${comment} */\n`;
+        mediaQuery += `@media (max-width: ${breakpoint.viewportBreakpoint}px) {\n`;
+        for (const column of breakpoint.columns) {
+          mediaQuery += `  .table.${key} > div > div.${column.key} { display: ${
+            column.status === "visible" ? "initial" : "none"
+          }; }\n`;
+        }
+
+        breakpointStyle.textContent += mediaQuery;
+
+        const breakpointP = document.createElement("p");
+        breakpointP.textContent = comment;
+        tableDiv.insertAdjacentElement("beforebegin", breakpointP);
+        break;
       }
+      case 1: {
+        let comment = `Hide ${breakpoint.hideColumnKey} at viewport ${breakpoint.viewportBreakpoint}px, table ${breakpoint.tableBreakpoint}px`;
+        if (breakpoint.showColumnKey) {
+          comment += ` and show ${breakpoint.showColumnKey} again`;
+        }
 
-      let breakpoint = `/* ${comment} */\n`;
-      breakpoint += `@media (max-width: ${viewportBreakpoint}px) {\n`;
-      breakpoint += `  .table.${key} > div > div.${hideColumnKey} { display: none; }\n`;
-      if (showColumnKey) {
-        breakpoint += `  .table.${key} > div > div.${showColumnKey} { display: initial; }\n`;
+        let mediaQuery = `/* ${comment} */\n`;
+        mediaQuery += `@media (max-width: ${breakpoint.viewportBreakpoint}px) {\n`;
+        mediaQuery += `  .table.${key} > div > div.${breakpoint.hideColumnKey} { display: none; }\n`;
+        if (breakpoint.showColumnKey) {
+          mediaQuery += `  .table.${key} > div > div.${breakpoint.showColumnKey} { display: initial; }\n`;
+        }
+
+        mediaQuery += "}";
+        breakpointStyle.textContent += mediaQuery;
+
+        const breakpointP = document.createElement("p");
+        breakpointP.textContent = comment;
+        tableDiv.insertAdjacentElement("beforebegin", breakpointP);
+        break;
       }
+      case 2: {
+        let comment = `Hide ${breakpoint.hideColumnKey} at viewport ${breakpoint.viewportBreakpoint}px, table ${breakpoint.tableBreakpoint}px`;
+        if (breakpoint.showColumnKey) {
+          comment += ` and show ${breakpoint.showColumnKey} again`;
+        }
 
-      breakpoint += "}";
-      breakpointStyle.textContent += breakpoint;
+        let mediaQuery = `/* ${comment} */\n`;
+        mediaQuery += `@media (max-width: ${breakpoint.viewportBreakpoint}px) {\n`;
+        mediaQuery += `  .table.${key} > div > div.${breakpoint.hideColumnKey} { display: none; }\n`;
+        if (breakpoint.showColumnKey) {
+          mediaQuery += `  .table.${key} > div > div.${breakpoint.showColumnKey} { display: initial; }\n`;
+        }
 
-      const breakpointP = document.createElement("p");
-      breakpointP.textContent = comment;
-      tableDiv.insertAdjacentElement("beforebegin", breakpointP);
-    } else {
-      const comment = `viewport ${viewportBreakpoint} | table ${tableBreakpoint} | ${columns
-        .map(c => c.key + " " + c.status)
-        .join(" | ")}`;
-      let breakpoint = `/* ${comment} */\n`;
-      breakpoint += `@media (max-width: ${viewportBreakpoint}px) {\n`;
-      for (const column of columns) {
-        breakpoint += `  .table.${key} > div > div.${column.key} { display: ${
-          column.status === "visible" ? "initial" : "none"
-        }; }\n`;
+        mediaQuery += "}";
+        breakpointStyle.textContent += mediaQuery;
+
+        const breakpointP = document.createElement("p");
+        breakpointP.textContent = comment;
+        tableDiv.insertAdjacentElement("beforebegin", breakpointP);
+        break;
       }
+      case 3: {
+        const comment = `Hide ${breakpoint.columnKey} at viewport ${breakpoint.viewportBreakpoint}px, table ${breakpoint.tableBreakpoint}px`;
+        breakpointStyle.textContent += `
+/* ${comment} */
+@media (max-width: ${breakpoint.viewportBreakpoint}px) {
+  .table.${key} > div > div.${breakpoint.columnKey} { display: none; }
+}
+`;
 
-      breakpointStyle.textContent += breakpoint;
-
-      const breakpointP = document.createElement("p");
-      breakpointP.textContent = comment;
-      tableDiv.insertAdjacentElement("beforebegin", breakpointP);
+        const breakpointP = document.createElement("p");
+        breakpointP.textContent = comment;
+        tableDiv.insertAdjacentElement("beforebegin", breakpointP);
+        break;
+      }
     }
   }
 
