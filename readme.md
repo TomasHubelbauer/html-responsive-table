@@ -28,6 +28,10 @@ that point on.
 
 ## Examples
 
+The tests contain comments which showcase both how the initial breakpoint
+estimation is calculated (the fit table size and the derived fit viewport
+size) and the breakpoint calculation.
+
 ### Static Deadspace
 
 See [`test/staticDeadspace.js`](test/staticDeadspace.js) comments.
@@ -41,54 +45,18 @@ See [`test/dynamicDeadspace.js`](test/dynamicDeadspace.js) comments.
 The algorithm is able to accept definitions of dead spaces as they surround the
 table which is used to correctly translate the viewport changes to the table
 changes including the effect of static or known-dynamic margins and maximal
-width of the table. This is sufficient for many scenarios, but scenarios where
-the table's placement within the page or size is derived in a more complex way
-and it is not possible to capture the dead spaces correctly, the calculation will
-accrue a degree of error. This is the result of the influence of rulesets on the
-tables ancestors in its path on the visual document tree and it is impractical to
-determine programatically, most likely. That's why we opt to support only the
-cases where the dead spaces are constant-enough that they can be captured and
-provided as an input to the algorithm.
+width of the table.
 
-## Techniques
+This is sufficient for many scenarios, but scenarios where the table's placement
+within the page or size is derived in a more complex way and it is not possible
+to capture the dead spaces correctly, the calculation will accrue a degree of error.
 
-When enumerating the breakpoints to find all that will affect the table columns,
-we need to define a range from where to where should we go. The lower bound is
-easy, zero, but the upper bound is tricky.
+This is the result of the influence of rulesets on the tables ancestors in its
+path on the visual document tree and it is impractical to determine programatically,
+most likely.
 
-We cannot just start with the column limits and sum them up, because the column
-ratios times that sum total might work out less that the individual columns'
-limits:
-
-| Title | Ratio | Limit |
-| ----- | ----- | ----- |
-| 1st   | .1    | 50    |
-| 2nd   | .2    | 50    |
-| 3rd   | .4    | 75    |
-| 4th   | .3    | 100   |
-
-The sum total here is 50 + 50 + 75 + 100 = 275 and the rationed sizes of the
-columns are: .1 times 275 = 27.5, .2 times 275 = 55, .4 times 275 = 110 and
-.3 times 275 = 82.5.
-
-The first and fourth columns do not reach their limits in this scenario, so
-that's not where we can start, we need to start at a higher value at which
-all columns fit including their ratios.
-
-We can calculate the minimal size according to each columns ratio and limit:
-
-- 1st = 1 / .1 times 50 = 500
-- 2nd = 1 / .2 times 50 = 250
-- 3rd = 1 / .4 times 75 = 187.5
-- 4th = 1 / .3 times 100 = 333.3
-
-The highest value is 500 and that's where we need to start.
-
-This is further complicated by tables with dynamic deadspaces where we on
-top of the table width to start at need to also find a viewport width that
-is able to accomodate the fit table and start from that viewport width
-working down, calculating the table width according to the changing dead
-space breakpoint.
+That's why we opt to support only the cases where the dead spaces are constant-enough
+that they can be captured and provided as an input to the algorithm.
 
 ## To-Do
 
@@ -127,3 +95,21 @@ yield exemplary unit test values.
 Play around with swapping the order of breakpoint and value in `renderCanvas`
 and see if the picture comes out rotated. Also play around with going from
 limit to zero not zero to limit and see what that does.
+
+Default `ratio` to one and `limit` to zero.
+
+Add an example of of a dead space simulating a pane which changes when on
+hover (this means the definition of dead spaces changes after the initial
+calculation). Add both a UI demo (with the actual hover hook) and a test.
+This will be implemented by recalculating the `style` element on both hover
+and leave of the pane with the updated `deadspace` definition reflecting
+the pane's visibility status.
+
+Add a demo of column resizing with two modes:
+
+- Resize to change the distribution of the table size between the columns
+  surrounding the divider (other columns stay constant and these two change
+  their ratios to follow the divider as it moves)
+- Resize to shrink or stretch the table size (column sizes remain constant
+  but their limits and possibly ratios change so that the resulting table
+  size grows by the same amount the divider did)
