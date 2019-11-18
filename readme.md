@@ -111,3 +111,159 @@ Add a demo of column resizing with two modes:
 - Resize to shrink or stretch the table size (column sizes remain constant
   but their limits and possibly ratios change so that the resulting table
   size grows by the same amount the divider did)
+
+## New Algo
+
+In order to avoid having to iterate all the viewport values, I'm working on
+a new algorithm.
+
+Basically, breakpoints happen only when the number of visible columns changes.
+This number starts at the number of columns and decreases by 1 (more?) until
+there are no columns left.
+
+The number should never decrease again I don't think, the fact that it
+currently does it a result of a bug where the current algorithm gives up
+"too soon" without realizing a column with more weight would fit after
+removing one with less and it results in a column disappearing and appearing
+again.
+
+To determine the breakpoints, start with all the columns and calculate the
+table fit size for them, then the viewport fit size from that. Then remove
+1 to get the breakpoint size and determine which column didn't make it.
+
+Then go with just the columns that are left, determine the table size, the
+viewport size from that, remove 1 and determine which column didn't make it
+next.
+
+Keep repeating until no columns are left.
+
+```js
+const columns = [
+  { key: 1, ratio: 0.1, limit: 50, weight: 0 },
+  { key: 2, ratio: 0.2, limit: 50, weight: 3 },
+  { key: 3, ratio: 0.4, limit: 75, weight: 2 },
+  { key: 4, ratio: 0.3, limit: 100, weight: 1 }
+];
+
+do {
+  const ratioSumTotal = columns.reduce((a, c) => a + c.ratio, 0);
+  const tableFitSize = Math.max(...columns.map(c => (ratioSumTotal / c.ratio) * c.limit));
+  const columnSizes = columns.map(c => (c.ratio / ratioSumTotal) * tableFitSize);
+  const columnToRemove = columns
+    // Find the columns which fit exactly so they will go when the viewport decreases by one
+    .filter((c, i) => c.limit === columnsSizes[i])
+    // Find the one with the smallest weight of those to know which of them will be the one to go
+    .sort((a, b) => b.weight - a.weight);
+  columns.splice(columns.indexOf(columnToRemove), 1);
+  yield {
+    breakpoint: tableFitSize - 1,
+    columnToRemove
+  };
+} while (columns.length > 0);
+
+/*
+NO DEAD SPACE
+1st round:
+  columns
+    [ #1, #2, #3, #4 ]
+  ratioSumTotal
+    .1 + .2 + .4 + .3 = 1
+  tableFitSize
+    max([ (1 / .1) * 50, (1 / .2) * 50, (1 / .4) * 75, (1 / .3) * 100 ])
+    max([ 10 * 50, 5 * 50, 2.5 * 75, 3.33 * 100 ])
+    max([ 500, 250, 187.5, 333.33 ])
+    500
+  columnSizes
+    [ (.1 / 1) * 500, (.2 / 1) * 500, (.4 / 1) * 500, (.3 / 1) * 500 ]
+    [ .1 * 500, .2 * 500, .4 * 500, .3 * 500 ]
+    [ 50, 100, 200, 150 ]
+  columnToRemove
+    filter
+      [ #1 ]
+    sort
+      [ #1 ]
+    #1
+  columns.splice
+    [ #2, #3, #4 ]
+  yield
+    { breakpoint: 500 - 1, columnToRemove: #1 }
+
+2nd round:
+  columns
+    [ #2, #3, #4 ]
+  ratioSumTotal
+    .2 + .4 + .3 = .9
+  tableFitSize
+    max([ (.9 / .2) * 50, (.9 / .4) * 75, (.9 / .3) * 100 ])
+    max([ 4.5 * 50, 2.25 * 75, 3 * 100 ])
+    max([ 225, 168.75, 300 ])
+    300
+  columnSizes
+    [ (.2 / .9) * 300, (.4 / .9) * 300, (.3 / .9) * 300 ]
+    [ .22 * 300, .44 * 300, .33 * 300 ]
+    [ 66.66, 133.33, 100 ]
+  columnToRemove
+    filter
+      [ #4 ]
+    sort
+      [ #4 ]
+    #4
+  columns.splice
+    [ #2, #3 ]
+  yield
+    { breakpoint: 300, columnToRemove: #4 }
+
+3rd round:
+  columns
+    [ #2, #3 ]
+  ratioSumTotal
+    .2 + .4 = .6
+  tableFitSize
+    max([ (.6 / .2) * 50, (.6 / .4) * 75 ])
+    max([ 150, 150 ])
+    150
+  columnSizes
+    [ (.2 / .6) * 150, (.4 / .6) * 150 ]
+    [ .33 * 150, .66 * 150 ]
+    [ 50, 100 ]
+  columnToRemove
+    filter
+      [ #2 ]
+    sort
+      [ #2 ]
+    #2
+  columns.splice
+    [ #3 ]
+  yield
+    { breakpoint: 150, columnToRemove: #3 }
+
+4th round:
+  columns
+    [ #2 ]
+  ratioSumTotal
+    .2
+  tableFitSize
+    max([ (.2 / .2) * 50 ])
+    max([ 50 ])
+    50
+  columnSizes
+    [ (.2 / .2) * 50 ]
+    [ 50 ]
+  columnToRemove
+    filter
+      [ #2 ]
+    sort
+      [ #2 ]
+    #2
+  columns.splice
+    []
+  yield
+    { breakpoint: 50, columnToRemove: #4 }
+
+STATIC DEAD SPACE
+TODO
+
+DYNAMIC DEAD SPACE
+TODO
+*/
+```
