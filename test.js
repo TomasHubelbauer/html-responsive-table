@@ -112,7 +112,7 @@ for (const test of tests) {
   if (testErrors) {
     console.warn(`Found ${testErrors} test errors.`);
     errors += testErrors;
-  } else {
+  } else if (rounds) {
     const durations = [];
     for (let round = 0; round < rounds; round++) {
       const timestamp = performance.now();

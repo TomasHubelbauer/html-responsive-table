@@ -25,7 +25,6 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     viewportWidth--
   ) {
     let tableWidth = deriveTableFromViewport(viewportWidth, deadspace);
-    //console.log("viewport", viewportWidth, "table", tableWidth);
 
     // Start with all the columns in each viewport dimension and recursively remove the unfitting ones
     const columns = [...tableColumns];

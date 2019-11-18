@@ -27,7 +27,7 @@ export default {
     // so some columns don't reach their limit: 1 (49.9 vs 50)
     // the single non-fitting column gets removed
     // At 499 with the column 1 removed and the remaining column ratio sum total of
-    // .2 + .3 + .4 = .9 the column sizes are:
+    // .2 + .4 + .3 = .9 the column sizes are:
     // (.2 / .9) * 499 = 110.88...
     // (.4 / .9) * 499 = 221.77...
     // (.3 / .9) * 499 = 166.33...
@@ -39,21 +39,56 @@ export default {
     // so some columns don't reach their limit: 1 (30 vs 50) and 4 (33.33... vs 100)
     // and of those 1 has a lower weight so it gets removed
     // At 300 with the column 1 removed and the remaining column ratio sum total of
-    // .2 + .3 + .4 = .9 the column sizes are:
+    // .2 + .4 + .3 = .9 the column sizes are:
     // (.2 / .9) * 300 = 66.66...
     // (.4 / .9) * 300 = 133.33...
-    // (.3 / .9) * 300 = 100
-    // TODO: Find out why 4 gets removed if it works out to exactly a hundred
-    // TODO: Work throuh the last round of 300 with 4 removed
+    // (.3 / .9) * 300 = 100 (99.99... due to rounding errors)
+    // so the column 4 doesn't reach its limit (99.99... vs 100) and gets removed
+    // At 300 with columns 1 and 4 removed and the remaining column ratio sum total of
+    // .2 + .4 = .6 the column sizes are:
+    // (.2 / .6) * 300 = 100
+    // (.4 / .6) * 300 = 200
+    // so all remaining columns reach their limits and these are the final expected column sizes.
     { viewport: 316, table: 300, columns: { 2: 100, 3: 200 } },
 
-    // TODO: Work out the expected valiues as per the above
+    // At 149 the column sizes with the column ratio sum total of .1 + .2 + .4 + .3 = 1 are:
+    // (.1 / 1) * 149 = 14.9, (.2 / 1) * 149 = 29.8, (.4 / 1) * 149 = 59.6, (.3 / 1) * 149 = 44.7
+    // so none of the columns fit: 1 (14.9 vs 50), 2 (29.8 vs 50), 3 (59.6 vs 75) and 4 (44.7 vs 100)
+    // of those 1 has the lowest weight (0) so it gets removed
+    // At 149 with 1 removed and the remaining column ratio sum total of .2 + .4 + .3 = .9 the column sizes are:
+    // (.2 / .9) * 149 = 33.11...
+    // (.4 / .9) * 149 = 66.22...
+    // (.3 / .9) * 149 = 49.66...
+    // so some of the columns don't fit: 2 (33.11... vs 50), 4 (49.66... vs 100)
+    // of those 4 has the lowest weight (1) so it gets removed
+    // At 149 with 1 and 4 removed and the remaining column ratio sum total of .2 + .4 = .6 the column sizes are:
+    // (.2 / .6) * 149 = 49.66...
+    // (.4 / .6) * 149 = 99.33...
+    // so none of the columns fit: 2 (49.66... vs 50) and 3 (99.33... vs 75)
+    // of those 3 has a lower weight, but second also didn't fit so it gets removed
+    // This is something to get fixed because after removing 3, 2 fits again so 3 should be removed instead
+    // At 149 with 1, 2 and 4 removed, 3 stretches the whole size
     { viewport: 165, table: 149, columns: { 3: 149 } },
 
-    // TODO: Work out the expected values as per the above
+    // At 112 the column sizes with the column ratio sum total of .1 + .2 + .4 + .3 = 1 are:
+    // (.1 / 1) * 112 = 11.2, (.2 / 1) * 112 = 22.4, (.4 / 1) * 112 = 44.8, (.3 / 1) * 112 = 33.6
+    // so none of the columns fit
+    // of those 1 has the lowest weight (0) so it gets removed
+    // At 112 with 1 removed and the remaining column ratio sum total of .2 + .4 + .3 = .9 the column sizes are:
+    // (.2 / .9) * 112 = 24.88...
+    // (.4 / .9) * 112 = 49.77...
+    // (.3 / .9) * 112 = 37.33...
+    // so none of the columns fit
+    // of those 4 has the lowest weight (1) so it gets removed
+    // At 112 with 1 and 4 removed and the remaining column ratio sum total of .2 + .4 = .6 the column sizes are:
+    // (.2 / .6) * 112 = 37.33...
+    // (.4 / .6) * 112 = 74.66...
+    // so none of the columns fit
+    // of those 3 has the lower weight (2) so it gets removed
+    // At 112 with 1, 3 and 4 removed, 2 stretches the whole size
     { viewport: 128, table: 112, columns: { 2: 112 } },
 
-    // TODO: Work out the expected values as per the above
+    // At 49 none of the columns can fit, because the lowest limit is 50, so all columns get removed
     { viewport: 65, table: 49, columns: {} }
   ]
 };
