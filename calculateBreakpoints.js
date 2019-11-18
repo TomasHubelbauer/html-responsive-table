@@ -47,21 +47,26 @@ export default function* calculateBreakpoints(
       columnToRemove = undefined;
 
       // Recalculate the sum total of the ratio excluding the removed columns so the ratios add up to 1
-      const adjustedColumnRatioSum = columns.reduce((a, c) => a + c.ratio, 0);
+      const adjustedColumnRatioSum = columns.reduce(
+        (a, c) => a + (c.ratio || 1),
+        0
+      );
 
       // Walk the remaining columns in this iteration for this viewport size in case of multiple removals
       for (const column of columns) {
         // Recalculate the column ratio to compare it to the ratio sum total of the remaining columns
-        const adjustedColumnRatio = column.ratio / adjustedColumnRatioSum;
+        const adjustedColumnRatio =
+          (column.ratio || 1) / adjustedColumnRatioSum;
 
         // Determine the size occupied by the column with its adjusted ratio among the remaining columns
         const effectiveColumnWidth = adjustedColumnRatio * tableWidth;
 
         if (
           // Mark this column for deletion if it doesn't reach its limit
-          effectiveColumnWidth < column.limit &&
+          effectiveColumnWidth < (column.limit || 0) &&
           // Replace the currently marked column for deletion only if this one has lower weight
-          (!columnToRemove || column.weight < columnToRemove.weight)
+          (!columnToRemove ||
+            (column.weight || 0) < (columnToRemove.weight || 0))
         ) {
           columnToRemove = column;
         }

@@ -96,8 +96,6 @@ Play around with swapping the order of breakpoint and value in `renderCanvas`
 and see if the picture comes out rotated. Also play around with going from
 limit to zero not zero to limit and see what that does.
 
-Default `ratio` to one and `limit` to zero.
-
 Add an example of of a dead space simulating a pane which changes when on
 hover (this means the definition of dead spaces changes after the initial
 calculation). Add both a UI demo (with the actual hover hook) and a test.
