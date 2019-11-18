@@ -2,21 +2,16 @@ import calculateFit from "./calculateFit.js";
 import deriveViewportFromTable from "./deriveViewportFromTable.js";
 import deriveTableFromViewport from "./deriveTableFromViewport.js";
 
-const useNewVersion = false;
-
+// TODO: Finalize this version which correctly reports only show/hide changes and not all columns
 export default function* calculateBreakpoints(
   /** @type {Column[]} */
   tableColumns,
   /** @ype {number | {}} */
   deadspace
 ) {
-  // TODO: Finalize this optimal solution
   // Keep track of the column which was reported for removal last so we don't report it again
   /** @type {Column?} */
   let lastColumnToRemove;
-
-  // TODO: Remove this non-optimal solution
-  let breakpoint;
 
   // Calculate the size above which there can be no breakpoint because all columns fit and go from there
   const fitTableWidth = calculateFit(tableColumns);
@@ -83,26 +78,8 @@ export default function* calculateBreakpoints(
       // Continue if we find a non-fitting column if any to recalculate the remaining columns' fit
     } while (columnToRemove);
 
-    const visibleColumns = columns.map(c => c.key).join();
-    if (!useNewVersion && breakpoint !== visibleColumns) {
-      if (columns.length < tableColumns.length) {
-        yield {
-          version: 0,
-          tableBreakpoint: tableWidth,
-          viewportBreakpoint: viewportWidth,
-          columns: tableColumns.map(c => ({
-            key: c.key,
-            status: columns.includes(c) ? "visible" : "hidden"
-          }))
-        };
-      }
-
-      breakpoint = visibleColumns;
-    }
-
-    // TODO: Finalize this version which correctly reports only show/hide changes and not all columns
     // Notify the caller to remove a column if the candidate for removal has changed since last time
-    if (useNewVersion && lastColumnToRemove !== lastRoundColumnToRemove) {
+    if (lastColumnToRemove !== lastRoundColumnToRemove) {
       yield {
         version: 1,
 

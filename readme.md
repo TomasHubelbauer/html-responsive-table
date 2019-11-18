@@ -60,50 +60,35 @@ that they can be captured and provided as an input to the algorithm.
 
 ## To-Do
 
+Reword the limitations when dead spaces are made update-able to make it
+clear that out of the box this solution requires a stable definition of dead
+spaces, but you can plug in your own variable definition of dead spaces if you
+choose to listen to resize / scroll changes and update the dead spaces yourself.
+
+Introduce a configration switch to all version which configures whether the
+version removes a column as soon as it doesn't fit anymore no matter what or
+whether it removes a lower-weight but still fitting version in order to keep
+a higher weight column by making it fit.
+
 Fix the bug with the part width table where the code currently throws an
-error in the new version.
-
-Finalize the currently buggy new version which only reports visibility
-changes and get rid of the old version which for each breakpoint reports
-the visibility of all columns.
-
-Be smarted about the weights, in the demo table, third should be removed, not
-second, because removing third (which fits but has lower weight) will make
-enough room to fit second again. So we need to do an extra / a better pass to
-include this check.
-
-See if there is a way to instead of iterating all the possible viewport sizes
-derive the exact breakpoint values numerically. Some sort of a dynamic
-programming exercise or something. We don't need the exact values because the
-layout engine will round them up to an integer anyway, but we should still
-pursue this, because it will allow us to get rid of the iteration and only
-enumerate the actual change points.
+error in version 1.
 
 Finalize documenting the expected values in the dynamic deadspace test.
 
-Advance `renderCanvas` to find `limit` from the columns and iterate all the
-possible breakpoint values within that limit and then all the possible values
-of that breakpoint within that limit and report the first breakpoint-value pair
-for each unique path from all columns to one or no columns. Extend this further
-to be able to sweep the range with two breakpoints (and the full possible extent
-of their values) or more. Take into the account that with multiple breakpoints,
-ordering logic will result in the subsequent breakpoints' ranges being reduced
-compared to the previous. Ultimately something like `deriveDeadspacesFromColumns`
-should be the result of this work and the results of that function should
-yield exemplary unit test values.
+Add tests for all versions - update the test harness to have checks which
+depend on the shape of the return objects (all columns vs changes).
 
-Play around with swapping the order of breakpoint and value in `renderCanvas`
-and see if the picture comes out rotated. Also play around with going from
-limit to zero not zero to limit and see what that does.
+Replace `renderCanvas` with some sort of a combinatorical testing harness
+which enumerates all possible viewport sizes (up to the one needed to
+accomodate fit table with all columns) and combines dead spaces with zero
+to N breakpoints (which are ordered and consecutive - keep that in mind)
+and identifies ranges which give the same breakpoints. Do not do this
+visually (it is just useful for debugging), but do it.
 
-Add an example of of a dead space simulating a pane which changes when on
-hover (this means the definition of dead spaces changes after the initial
-calculation). Add both a UI demo (with the actual hover hook) and a test.
-This will be implemented by recalculating the `style` element on both hover
-and leave of the pane with the updated `deadspace` definition reflecting
-the pane's visibility status.
+Add an example of variable dead spaces, for example a pane which has some
+breakpoints but also changes its size on hover.
 
-Add a demo of column resizing with two modes:
+Add support of column resizing with two modes through variable dead spaces:
 
 - Resize to change the distribution of the table size between the columns
   surrounding the divider (other columns stay constant and these two change
@@ -112,14 +97,8 @@ Add a demo of column resizing with two modes:
   but their limits and possibly ratios change so that the resulting table
   size grows by the same amount the divider did)
 
-Fix the bug in the version 3 where the item with higher weight gets selected
-anyway.
-
-Compare the three versions of `calculateBreakpoints` but probably roll with
-the last one as that one is most likely the best as it generates breakpoints
-efficiently and removes weights in the correct order.
-
-Update the tests for the latest version.
+Compare all versions when fixed to see if they all yield the same ranges
+and select the simplest one, which is probably going to be the version 3.
 
 Test this test case which checks the ordering logic.
 

@@ -31,9 +31,16 @@ export default function* calculateBreakpoints(
       (_, i) => columnsTableSizes[i] === tableSize
     )[0];
 
-    debugger;
     // Remove the identified column which has the lowest weight of those at their limits
-    columns.splice(columns.indexOf(columnToRemove), 1);
+    if (columnToRemove === columns[0]) {
+      columns.shift();
+    } else {
+      // TODO: Add a config value `preference` which switches between:
+      // - Removing a column as soon as it doesn't fit even if other fitting columns have lower weight
+      // - Removing a column even if it fits if it means keeping another column with higher weight
+      debugger;
+      columns.splice(columns.indexOf(columnToRemove), 1);
+    }
 
     // Calculate the viewport size resulting in the above table size including dead space
     const viewportSize = deriveViewportFromTable(tableSize, deadspace);
