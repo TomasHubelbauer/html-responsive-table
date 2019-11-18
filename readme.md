@@ -112,6 +112,14 @@ Add a demo of column resizing with two modes:
   but their limits and possibly ratios change so that the resulting table
   size grows by the same amount the divider did)
 
+Compare the results of the new algorithm idea below with the existing old
+implementation to see if they match up - but account for the bug with
+weights the current old one has, so probably do a lot of manual checking
+for the dynamic dead space cases (unroll manually with multiple variants
+of the deadspaces). Also fit the fact that this will still remove 2nd
+before 3rd in the test column set even though second has bigger weight
+than third.
+
 ## New Algo
 
 In order to avoid having to iterate all the viewport values, I'm working on
@@ -145,9 +153,12 @@ const columns = [
   { key: 4, ratio: 0.3, limit: 100, weight: 1 }
 ];
 
+const deadspace = 16;
+
 do {
   const ratioSumTotal = columns.reduce((a, c) => a + c.ratio, 0);
   const tableFitSize = Math.max(...columns.map(c => (ratioSumTotal / c.ratio) * c.limit));
+  const viewportFitSize = deriveViewportFromTable(tableFitSize, deadspace)
   const columnSizes = columns.map(c => (c.ratio / ratioSumTotal) * tableFitSize);
   const columnToRemove = columns
     // Find the columns which fit exactly so they will go when the viewport decreases by one
@@ -260,10 +271,216 @@ NO DEAD SPACE
   yield
     { breakpoint: 50, columnToRemove: #4 }
 
-STATIC DEAD SPACE
-TODO
+STATIC DEAD SPACE (16)
+1st round:
+  columns
+    [ #1, #2, #3, #4 ]
+  ratioSumTotal
+    .1 + .2 + .4 + .3 = 1
+  tableFitSize
+    max([ (1 / .1) * 50, (1 / .2) * 50, (1 / .4) * 75, (1 / .3) * 100 ])
+    max([ 10 * 50, 5 * 50, 2.5 * 75, 3.33 * 100 ])
+    max([ 500, 250, 187.5, 333.33 ])
+    500
+  viewportFitSize
+    516
+  columnSizes
+    [ (.1 / 1) * 500, (.2 / 1) * 500, (.4 / 1) * 500, (.3 / 1) * 500 ]
+    [ .1 * 500, .2 * 500, .4 * 500, .3 * 500 ]
+    [ 50, 100, 200, 150 ]
+  columnToRemove
+    filter
+      [ #1 ]
+    sort
+      [ #1 ]
+    #1
+  columns.splice
+    [ #2, #3, #4 ]
+  yield
+    { tableBreakpoint: 500, viewportBreakpoint: 516 columnToRemove: #1 }
 
-DYNAMIC DEAD SPACE
-TODO
+2nd round:
+  columns
+    [ #2, #3, #4 ]
+  ratioSumTotal
+    .2 + .4 + .3 = .9
+  tableFitSize
+    max([ (.9 / .2) * 50, (.9 / .4) * 75, (.9 / .3) * 100 ])
+    max([ 4.5 * 50, 2.25 * 75, 3 * 100 ])
+    max([ 225, 168.75, 300 ])
+    300
+  viewportFitSize
+    316
+  columnSizes
+    [ (.2 / .9) * 300, (.4 / .9) * 300, (.3 / .9) * 300 ]
+    [ .22 * 300, .44 * 300, .33 * 300 ]
+    [ 66.66, 133.33, 100 ]
+  columnToRemove
+    filter
+      [ #4 ]
+    sort
+      [ #4 ]
+    #4
+  columns.splice
+    [ #2, #3 ]
+  yield
+    { tableBreakpoint: 300, viewportBreakpoint: 316, columnToRemove: #4 }
+
+3rd round:
+  columns
+    [ #2, #3 ]
+  ratioSumTotal
+    .2 + .4 = .6
+  tableFitSize
+    max([ (.6 / .2) * 50, (.6 / .4) * 75 ])
+    max([ 150, 150 ])
+    150
+  viewportFitSize
+    166
+  columnSizes
+    [ (.2 / .6) * 150, (.4 / .6) * 150 ]
+    [ .33 * 150, .66 * 150 ]
+    [ 50, 100 ]
+  columnToRemove
+    filter
+      [ #2 ]
+    sort
+      [ #2 ]
+    #2
+  columns.splice
+    [ #3 ]
+  yield
+    { tableBreakpoint: 150, viewportBreakpoint: 166, columnToRemove: #3 }
+
+4th round:
+  columns
+    [ #2 ]
+  ratioSumTotal
+    .2
+  tableFitSize
+    max([ (.2 / .2) * 50 ])
+    max([ 50 ])
+    50
+  viewportFitSize
+    66
+  columnSizes
+    [ (.2 / .2) * 50 ]
+    [ 50 ]
+  columnToRemove
+    filter
+      [ #2 ]
+    sort
+      [ #2 ]
+    #2
+  columns.splice
+    []
+  yield
+    { tableBreakpoint: 50, viewportBreakpoint: 66, columnToRemove: #4 }
+
+DYNAMIC DEAD SPACE ({ 270: 0, _: 16 })
+1st round:
+  columns
+    [ #1, #2, #3, #4 ]
+  ratioSumTotal
+    .1 + .2 + .4 + .3 = 1
+  tableFitSize
+    max([ (1 / .1) * 50, (1 / .2) * 50, (1 / .4) * 75, (1 / .3) * 100 ])
+    max([ 10 * 50, 5 * 50, 2.5 * 75, 3.33 * 100 ])
+    max([ 500, 250, 187.5, 333.33 ])
+    500
+  viewportFitSize
+    516
+  columnSizes
+    [ (.1 / 1) * 500, (.2 / 1) * 500, (.4 / 1) * 500, (.3 / 1) * 500 ]
+    [ .1 * 500, .2 * 500, .4 * 500, .3 * 500 ]
+    [ 50, 100, 200, 150 ]
+  columnToRemove
+    filter
+      [ #1 ]
+    sort
+      [ #1 ]
+    #1
+  columns.splice
+    [ #2, #3, #4 ]
+  yield
+    { tableBreakpoint: 500, viewportBreakpoint: 516 columnToRemove: #1 }
+
+2nd round:
+  columns
+    [ #2, #3, #4 ]
+  ratioSumTotal
+    .2 + .4 + .3 = .9
+  tableFitSize
+    max([ (.9 / .2) * 50, (.9 / .4) * 75, (.9 / .3) * 100 ])
+    max([ 4.5 * 50, 2.25 * 75, 3 * 100 ])
+    max([ 225, 168.75, 300 ])
+    300
+  viewportFitSize
+    316
+  columnSizes
+    [ (.2 / .9) * 300, (.4 / .9) * 300, (.3 / .9) * 300 ]
+    [ .22 * 300, .44 * 300, .33 * 300 ]
+    [ 66.66, 133.33, 100 ]
+  columnToRemove
+    filter
+      [ #4 ]
+    sort
+      [ #4 ]
+    #4
+  columns.splice
+    [ #2, #3 ]
+  yield
+    { tableBreakpoint: 300, viewportBreakpoint: 316, columnToRemove: #4 }
+
+3rd round:
+  columns
+    [ #2, #3 ]
+  ratioSumTotal
+    .2 + .4 = .6
+  tableFitSize
+    max([ (.6 / .2) * 50, (.6 / .4) * 75 ])
+    max([ 150, 150 ])
+    150
+  viewportFitSize
+    150
+  columnSizes
+    [ (.2 / .6) * 150, (.4 / .6) * 150 ]
+    [ .33 * 150, .66 * 150 ]
+    [ 50, 100 ]
+  columnToRemove
+    filter
+      [ #2 ]
+    sort
+      [ #2 ]
+    #2
+  columns.splice
+    [ #3 ]
+  yield
+    { tableBreakpoint: 150, viewportBreakpoint: 150, columnToRemove: #3 }
+
+4th round:
+  columns
+    [ #2 ]
+  ratioSumTotal
+    .2
+  tableFitSize
+    max([ (.2 / .2) * 50 ])
+    max([ 50 ])
+    50
+  viewportFitSize
+    50
+  columnSizes
+    [ (.2 / .2) * 50 ]
+    [ 50 ]
+  columnToRemove
+    filter
+      [ #2 ]
+    sort
+      [ #2 ]
+    #2
+  columns.splice
+    []
+  yield
+    { tableBreakpoint: 50, viewportBreakpoint: 50, columnToRemove: #4 }
 */
 ```

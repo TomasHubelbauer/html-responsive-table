@@ -1,4 +1,4 @@
-import calculateBreakpoints from "./calculateBreakpoints.js";
+import calculateBreakpoints from "./calculateBreakpoints2.js";
 
 export default function renderTable(
   /** @type {HTMLElement} */

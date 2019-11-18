@@ -19,6 +19,7 @@ export default function deriveViewportFromTable(
     }
 
     if (table < Number(breakpoint) - deadspace) {
+      breakpointDeadspace = deadspace;
       break;
     }
 
