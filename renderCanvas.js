@@ -1,5 +1,6 @@
 import calculateBreakpoints from "./calculateBreakpoints.js";
 
+/** @type {Column[]} */
 const columns = [
   { key: 1, ratio: 0.1, limit: 50, weight: 0 },
   { key: 2, ratio: 0.2, limit: 50, weight: 3 },

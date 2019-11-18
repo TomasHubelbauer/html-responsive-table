@@ -1,10 +1,15 @@
 import calculateBreakpoints from "./calculateBreakpoints.js";
 
 export default function renderTable(
+  /** @type {HTMLElement} */
   parentElement,
+  /** @type {string} */
   key,
+  /** @type {any[]} */
   data,
+  /** @type {Column[]} */
   headings,
+  /** @type {Deadspace} */
   deadspace
 ) {
   const tableDiv = document.createElement("div");

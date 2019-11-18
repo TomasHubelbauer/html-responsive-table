@@ -4,9 +4,15 @@ import deriveTableFromViewport from "./deriveTableFromViewport.js";
 
 const useNewVersion = false;
 
-export default function* calculateBreakpoints(tableColumns, deadspace) {
+export default function* calculateBreakpoints(
+  /** @type {Column[]} */
+  tableColumns,
+  /** @ype {number | {}} */
+  deadspace
+) {
   // TODO: Finalize this optimal solution
   // Keep track of the column which was reported for removal last so we don't report it again
+  /** @type {Column?} */
   let lastColumnToRemove;
 
   // TODO: Remove this non-optimal solution
@@ -30,9 +36,11 @@ export default function* calculateBreakpoints(tableColumns, deadspace) {
     const columns = [...tableColumns];
 
     // Remember which column ultimately got marked for deletion for this viewport size across its iterations
+    /** @type {Column?} */
     let lastRoundColumnToRemove;
 
     // Hoist which column to remove outside of the loop so that we can use it in its condition
+    /** @type {Column?} */
     let columnToRemove;
     do {
       // Reset this so that we avoid a false positive in the `while` condition if this is set from last iteration

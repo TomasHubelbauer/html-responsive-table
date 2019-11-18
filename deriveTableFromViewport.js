@@ -1,4 +1,9 @@
-export default function deriveTableFromViewport(viewport, deadspaces) {
+export default function deriveTableFromViewport(
+  /** @type {number} */
+  viewport,
+  /** @type {Deadspace} */
+  deadspaces
+) {
   if (typeof deadspaces === "number") {
     return viewport - deadspaces;
   }
@@ -7,6 +12,7 @@ export default function deriveTableFromViewport(viewport, deadspaces) {
     throw new Error("Deadspace must be an object or a number!");
   }
 
+  /** @type {number} */
   let tableWidth;
   for (const [breakpoint, deadspace] of Object.entries(deadspaces)) {
     if (breakpoint === "_") {
