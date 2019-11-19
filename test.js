@@ -1,6 +1,6 @@
 import staticDeadspace from "./test/staticDeadspace.js";
 import dynamicDeadspace from "./test/dynamicDeadspace.js";
-import calculateBreakpoints from "./calculateBreakpoints.js";
+import calculateBreakpoints from "./calculateBreakpoints0.js";
 
 const tests = [staticDeadspace, dynamicDeadspace];
 

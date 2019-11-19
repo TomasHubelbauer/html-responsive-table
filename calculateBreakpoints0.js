@@ -27,10 +27,6 @@ export default function* calculateBreakpoints(
     // Start with all the columns in each viewport dimension and recursively remove the unfitting ones
     const columns = [...tableColumns];
 
-    // Remember which column ultimately got marked for deletion for this viewport size across its iterations
-    /** @type {Column?} */
-    let lastRoundColumnToRemove;
-
     // Hoist which column to remove outside of the loop so that we can use it in its condition
     /** @type {Column?} */
     let columnToRemove;
@@ -67,9 +63,6 @@ export default function* calculateBreakpoints(
       // Remove the non-fitting column with the lowest weight if any
       if (columnToRemove) {
         columns.splice(columns.indexOf(columnToRemove), 1);
-
-        // Remember which column got removed for this viewport size across all its iterations
-        lastRoundColumnToRemove = columnToRemove;
       }
 
       // Continue if we find a non-fitting column if any to recalculate the remaining columns' fit

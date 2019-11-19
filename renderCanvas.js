@@ -1,4 +1,4 @@
-import calculateBreakpoints from "./calculateBreakpoints.js";
+import calculateBreakpoints from "./calculateBreakpoints0.js";
 
 /** @type {Column[]} */
 const columns = [
