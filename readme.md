@@ -236,3 +236,8 @@ There are multiple versions, but no version solves them all.
    -object API we have currently, but I can't make it a function, because then I
    couldn't derive the optimal break points taking into an account the deadspaces
    (see #1) and even with it being an object I have not solved that.
+4. I still don't know if it is possible for a column to resurrect. I was not able to
+   come up with an edge case where just the column values would cause a column to
+   disappear and then reappear when removing some other column made new room for it.
+   This is most likely possible to happen, but maybe only when deadspaces come into
+   play?
