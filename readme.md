@@ -241,3 +241,31 @@ There are multiple versions, but no version solves them all.
    disappear and then reappear when removing some other column made new room for it.
    This is most likely possible to happen, but maybe only when deadspaces come into
    play?
+
+## Test Cases
+
+### Reappaer
+
+Columns:
+
+1. limit 50, ratio 1, weight 1
+2. limit 100, ratio 2, weight 3
+3. limit 50, ratio 3, weight 2
+
+Deadspace:
+
+- 700+: 300
+- 600+: 200
+- 500+: 100
+- 400+: 0
+- 300+: 100
+- 200+: 200
+- 100+: 300
+- 0+: 400
+
+Table fit:
+
+- Ratio total: 1 + 2 + 3 = 6
+- Column table sizes: (6 / 1) \* 50, (6 / 3) \* 100, (6 / 2) \* 50 = 350, 200, 150
+- Table fit: 350
+- Viewport fit: 350 + 100 (300+) = 450
