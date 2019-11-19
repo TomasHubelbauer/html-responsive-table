@@ -12,6 +12,8 @@ export default function renderTable(
   /** @type {Deadspace} */
   deadspace
 ) {
+  const ratioStyle = document.createElement("style");
+
   const tableDiv = document.createElement("div");
   tableDiv.className = "table " + key;
 
@@ -21,7 +23,7 @@ export default function renderTable(
     const headingDiv = document.createElement("div");
     headingDiv.className = heading.key;
     headingDiv.innerHTML = `${heading.title}<br/>${heading.limit}px<br/>${heading.weight}`;
-    headingDiv.style.flex = heading.ratio;
+    ratioStyle.textContent += `.table.${key} > div > div.${heading.key} { flex: ${heading.ratio}; }\n`;
     headerDiv.append(headingDiv);
   }
 
@@ -33,7 +35,6 @@ export default function renderTable(
       const cellDiv = document.createElement("div");
       cellDiv.className = heading.key;
       cellDiv.textContent = heading.value(item);
-      cellDiv.style.flex = heading.ratio;
       rowDiv.append(cellDiv);
     }
 
@@ -41,6 +42,8 @@ export default function renderTable(
   }
 
   parentElement.replaceWith(tableDiv);
+
+  tableDiv.insertAdjacentElement("beforebegin", ratioStyle);
 
   const breakpointStyle = document.createElement("style");
   for (const breakpoint of calculateBreakpoints(headings, deadspace)) {
