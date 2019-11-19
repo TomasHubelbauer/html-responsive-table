@@ -206,3 +206,33 @@ We need to land at these ratios:
 - ? \* 600 = 150 = .25
 
 That totals one so scaled to 10 it gives 2.5, 1.6, 3.3 and 2.5.
+
+## Algorithm
+
+The algorithm is based on deriving the table size from the viewport size,
+finding points at which the table size reaches values which cause the columns
+that can be displayed for the value to change and generating CSS media queries
+which are based on the viewport size and hiding or showing columns in the table
+in order to make the disappearing and appearing of columns happen.
+
+The input is a set of columns which each define their minimum size, priority and
+flex among one another.
+
+## Problems
+
+There are a few problems with this algorithm as implemented.
+There are multiple versions, but no version solves them all.
+
+1. I have no figured out how to completely avoid iterating the viewport size down
+   I have implemented versions, which figure out break-points of the table size by
+   calculating the sizes at which columns no longer fit and thus that's where the
+   next breakpoint must be, but this doesn't take into an account dynamic deadspaces,
+   which might make new room which wasn't there before or remove room which was
+   there in the middle of two points derived from just the column values.
+2. The columns do not get removed in the right order: sometimes a higher priority
+   column will get removed before a lower priority one because the higher priority
+   one reaches its limit faster than the lower priority one.
+3. I want to avoid the clunky table-from-viewport viewport-from-table deadspaces-as
+   -object API we have currently, but I can't make it a function, because then I
+   couldn't derive the optimal break points taking into an account the deadspaces
+   (see #1) and even with it being an object I have not solved that.
