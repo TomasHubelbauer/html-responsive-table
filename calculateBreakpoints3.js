@@ -38,6 +38,7 @@ export default function* calculateBreakpoints(
       // TODO: Add a config value `preference` which switches between:
       // - Removing a column as soon as it doesn't fit even if other fitting columns have lower weight
       // - Removing a column even if it fits if it means keeping another column with higher weight
+      // TODO: Actually default to saving the higher weight item by the lower weight one
       debugger;
       columns.splice(columns.indexOf(columnToRemove), 1);
     }
@@ -55,6 +56,10 @@ export default function* calculateBreakpoints(
     };
   } while (columns.length > 0);
 }
+
+void function test() {
+  // TODO
+};
 
 /*
 tableColumns [
