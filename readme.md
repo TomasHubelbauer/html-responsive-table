@@ -113,3 +113,96 @@ The first breakpoint should be 400 and should remove #4.
 The second 300 and remove #3.
 The third 200 and remove #2.
 The last 100 and remove #1.
+
+## Column Resizing
+
+Column resizing is not supported out of the box with this component, but
+should be implementable using its APIs.
+
+There are two possible ways to implement column resizing:
+
+1. Dragging the divider between two columns preserves the combined size of
+   the two columns and adjusts their ratios between each other resulting in
+   changing column sizes of the two columns surrounding the divider, but not
+   the table itself
+2. Dragging the divider between two columns preserves the size of the
+   columns in the direction of the drag and increases the size of the column
+   neighboring the divider in the opposite direction of the drag, resulting
+   in table size increase equal to the column size increase
+
+The first solution should be implementable by translating the positive and
+negative offsets on each size of the divider to changes in the `ratio` fields
+of each column definition and regenerating the media queries `style` element
+content to reflect the new `flex` attribute values.
+
+Say the table has the size of 500 and the columns are defined as:
+
+| Key | Ratio | Limit |
+| --- | ----- | ----- |
+| 1   | 1     | 50    |
+| 2   | 2     | 50    |
+| 3   | 4     | 75    |
+| 4   | 3     | 100   |
+
+At table size 500, the column sizes are 50, 100, 200, 150.
+
+Say I drag the divider between the first two columns by 10 to the right.
+The resulting column sizes should be: 60, 90, 200, 150.
+The ratios that will need to be updated are those of the first two columns:
+1 and 3. Their total should not change, so presumably adjusting them in
+accordance with the adjusted sizes should yield the desired result:
+
+50 vs 100 is 1 vs 2 total 3
+
+60 vs 90 is 2 vs 3 total 5 adjusted to three is 2/5 vs 3/5 is 1.2 vs 1.8,
+total still three.
+
+(1.2 / 10) times 500 = 60
+(1.8 / 10) times 500 = 90
+
+It works!
+
+The second solution should be implementable by realizing that dragging the
+divider by some amount will result in the table size increase by the same
+amount. Dragging from 500 to 600 without changing any ratios will add the
+extra 100 distributed to all columns according to their ratios. To prevent
+this and only extend the single column, the ratios of all other columns
+need to be decreased just enough to negate the would-be addition, resulting
+in the entire addition being admitted to the single column being resized.
+
+| Key | Ratio | Limit |
+| --- | ----- | ----- |
+| 1   | 1     | 50    |
+| 2   | 2     | 50    |
+| 3   | 4     | 75    |
+| 4   | 3     | 100   |
+
+Ratio total: 10.
+
+At 500, the sizes are:
+
+- 1/10 \* 500 = 50
+- 2/10 \* 500 = 100
+- 4/10 \* 500 = 200
+- 3/10 \* 500 = 150
+
+At 600, the sizes are:
+
+- 1/10 \* 600 = 60 (extra 10)
+- 2/10 \* 600 = 120 (extra 20)
+- 4/10 \* 600 = 240 (extra 40)
+- 3/10 \* 600 = 180 (extra 30)
+
+We're dragging the first column, which means we need to negate the gains for
+the second (20), third (40) and fourth (30) resulting in an additional 90 being
+added to 90 in addition to its ten totalling a 100 by which we dragged the divider.
+
+We need to land at these ratios:
+
+- ? \* 600 = 150 = .25
+
+- ? \* 600 = 100 = .16
+- ? \* 600 = 200 = .33
+- ? \* 600 = 150 = .25
+
+That totals one so scaled to 10 it gives 2.5, 1.6, 3.3 and 2.5.
