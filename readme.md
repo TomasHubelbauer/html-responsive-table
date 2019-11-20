@@ -269,3 +269,274 @@ Table fit:
 - Column table sizes: (6 / 1) \* 50, (6 / 3) \* 100, (6 / 2) \* 50 = 350, 200, 150
 - Table fit: 350
 - Viewport fit: 350 + 100 (300+) = 450
+
+## To-Do
+
+| Key | Limit | Ratio | Priority |
+| --- | ----- | ----- | -------- |
+| 1   | 100   | 1     | 4        |
+| 2   | 100   | 1     | 2        |
+| 3   | 100   | 1     | 3        |
+| 4   | 100   | 1     | 1        |
+
+Deadspace = 0
+
+Fit table size = 400
+At 399 none of the columns fit
+#4 goes
+#1, #2, #3 stay
+Fit table size without #4 = 300
+At 299 none of the columns fit
+#2 goes
+#1 and #3 stay
+Fit table size without #4 and #2 = 200
+At 199 none of the columns fit
+#3 goes
+#1 stays
+Fit table size without #2, #3 and #4 = 100
+At 99 #1 no longer fits and #1 goes
+
+---
+
+| Key | Limit | Ratio | Priority |
+| --- | ----- | ----- | -------- |
+| 1   | 100   | 1     | 4        |
+| 2   | 100   | 1     | 2        |
+| 3   | 100   | 1     | 3        |
+| 4   | 100   | 1     | 1        |
+
+| Breakpoint   | Deadspace |
+| ------------ | --------- |
+| 0 - 200 inc. | 100       |
+| +200         | 0         |
+
+Fit table size = 400
+At 399 none of the columns fit
+#4 goes and leaves #1, #2 and #3
+Fit table size now = 300
+At 299 none of the columns fit
+
+---
+
+Things I need:
+
+- Defining deadspace as an object not a function to be able to determine the breakpoints
+-
+
+## New Idea
+
+Have a set of columns: 1, 2, 3, 4
+
+Calculate all possible column combinations:
+
+```js
+const columns = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }];
+
+const combos = [columns];
+for (let length = columns.length - 1; length > 0; length--) {
+  for (let offset = 0; offset < columns.length; offset++) {
+    const combo = [];
+    for (let index = 0; index < length; index++) {
+      combo.push(columns[(index + offset) % columns.length]);
+    }
+
+    combos.push(combo);
+  }
+}
+```
+
+Calculate the fit table sizes for those combinations:
+
+```js
+const columns = [
+  { key: 1, ratio: 1, limit: 100 },
+  { key: 2, ratio: 1, limit: 100 },
+  { key: 3, ratio: 1, limit: 100 },
+  { key: 4, ratio: 1, limit: 100 }
+];
+
+const combos = [];
+
+function addCombo(columns) {
+  const ratio = columns.reduce((a, c) => a + c.ratio, 0);
+  const sizes = columns.map(c => (ratio / c.ratio) * c.limit);
+  const table = Math.max(...sizes);
+  combos.push({ combo: columns, table });
+}
+
+addCombo(columns);
+for (let length = columns.length - 1; length > 0; length--) {
+  for (let offset = 0; offset < columns.length; offset++) {
+    const combo = [];
+    for (let index = 0; index < length; index++) {
+      const column = columns[(index + offset) % columns.length];
+      combo.push(column);
+    }
+
+    addCombo(combo);
+  }
+}
+
+for (const combo of combos) {
+  console.log(combo);
+}
+```
+
+Adjust all of the table sizes to viewport sizes using deadspace:
+
+```js
+const columns = [
+  { key: 1, ratio: 1, limit: 100 },
+  { key: 2, ratio: 1, limit: 100 },
+  { key: 3, ratio: 1, limit: 100 },
+  { key: 4, ratio: 1, limit: 100 }
+];
+
+const deadspace = size => {
+  if (size > 300) {
+    return 0;
+  }
+
+  if (size > 200) {
+    return 150;
+  }
+
+  if (size > 100) {
+    return 50;
+  }
+
+  return 100;
+};
+
+const combos = [];
+
+function addCombo(columns) {
+  const ratio = columns.reduce((a, c) => a + c.ratio, 0);
+  const sizes = columns.map(c => (ratio / c.ratio) * c.limit);
+  const table = Math.max(...sizes);
+  combos.push({ columns, table, viewport: table + deadspace(table) });
+}
+
+addCombo(columns);
+for (let length = columns.length - 1; length > 0; length--) {
+  for (let offset = 0; offset < columns.length; offset++) {
+    const combo = [];
+    for (let index = 0; index < length; index++) {
+      const column = columns[(index + offset) % columns.length];
+      combo.push(column);
+    }
+
+    addCombo(combo);
+  }
+}
+
+for (const combo of combos) {
+  console.log(
+    combo.columns.map(c => c.key),
+    combo.table,
+    combo.viewport
+  );
+}
+```
+
+Order the candidate breakpoints in descending order:
+
+```js
+const columns = [
+  { key: 1, ratio: 1, limit: 100 },
+  { key: 2, ratio: 1, limit: 100 },
+  { key: 3, ratio: 1, limit: 100 },
+  { key: 4, ratio: 1, limit: 100 }
+];
+
+const deadspace = size => {
+  if (size > 300) {
+    return 0;
+  }
+
+  if (size > 200) {
+    return 150;
+  }
+
+  if (size > 100) {
+    return 50;
+  }
+
+  return 100;
+};
+
+const combos = [];
+
+function addCombo(columns) {
+  const ratio = columns.reduce((a, c) => a + c.ratio, 0);
+  const sizes = columns.map(c => (ratio / c.ratio) * c.limit);
+  const table = Math.max(...sizes);
+  combos.push({ columns, table, viewport: table + deadspace(table) });
+}
+
+addCombo(columns);
+for (let length = columns.length - 1; length > 0; length--) {
+  for (let offset = 0; offset < columns.length; offset++) {
+    const combo = [];
+    for (let index = 0; index < length; index++) {
+      const column = columns[(index + offset) % columns.length];
+      combo.push(column);
+    }
+
+    addCombo(combo);
+  }
+}
+
+combos.sort((a, b) => b.viewport - a.viewport);
+
+for (const combo of combos) {
+  console.log(
+    combo.columns.map(c => c.key),
+    combo.table,
+    combo.viewport
+  );
+}
+```
+
+Calculate the status of each column at each breakpoint.
+
+Note that this will cause the table to break one pixel too early,
+becuase it could fit all the columns at the viewport table size,
+but the reason we choose to do this instead of just subtracting one
+pixel from the viewport/table size value of the combo and calculating
+with that is that the new viewport/table size decreased by one pixel
+could already be covered by a different deadspace breakpoint resulting
+in the table behaving incorrectly at runtime (deadspace breakpoint
+happens but the table one doesn't).
+
+[`calculateBreakpoints5.js`](calculateBreakpoints5.ks)
+
+- Iterate in descending order and check states of each column
+- Report columns changes from breakpoint to breakpoint
+- Skip false positive breakpoints
+
+TODO: Figure out how to deal with the multiple configs for a single
+viewport breakpoint value, need to marry it up somehow with the candidate
+found for removal and decide which of each to keep.
+
+## Yet Another New Idea
+
+We're basically racing two values: the priority and the having-reached-
+the-limit. We want to be removing columns in the order of priority only,
+but sometimes higher-priority columns will reach their limit and even
+removing the lower-priority columns (which still fit) won't make enough
+room for them so they need to go and those lower-priority columns can
+still stay because there is room for them, still.
+
+On top of this, the deadspaces have an effect on the table width which
+makes it non-linear with respect to the viewport width. This might
+result in breakpoints which are not successive, so there need to be two
+passes, one which enumerates the column removal in the order of priority
+and then possibly determines after having removed those given columns
+which lower priority ones can come back because there is still room for
+them and then another one which sorts and diffs these candidate breakpoints
+and calculates the changes from one to the next as the viewport sizes
+approaches zero.
+
+- Calculate the fit size of the table
+- Calculate the fit size of the table removing the first lowest priority column
