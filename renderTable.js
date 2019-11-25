@@ -12,6 +12,10 @@ export default function renderTable(
   /** @type {Deadspace} */
   deadspace
 ) {
+  if (key !== "debugTable") {
+    return;
+  }
+
   const ratioStyle = document.createElement("style");
 
   const tableDiv = document.createElement("div");

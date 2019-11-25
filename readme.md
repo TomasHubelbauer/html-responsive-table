@@ -540,3 +540,33 @@ approaches zero.
 
 - Calculate the fit size of the table
 - Calculate the fit size of the table removing the first lowest priority column
+
+## v6 Idea
+
+Start with the same as v0 but instead of removing columns successively, start
+with an empty set and add them as long as they fit. Add them in a priority
+order which should ensure that the problem with v0 where a column which could
+be saved isn't (see the static deadspace test).
+
+We still need the breakpoints to be defined using an object and not a function,
+because in order to optimize, we need to start a starting point based on the
+table width and the breakpoint deadspace for that table width, so we need a
+mapping in both ways, from table to viewport (the initial size) and from
+viewport to table (the breakpoint size). The reason we need to iterate the
+viewport size not the table size is that the viewport size remains linear
+whereas the table size might skip back and forth in response to the external
+breakpoints. Since we cannot invert the function to get table from viewport
+programatically, we would have to either accept two functions which are the
+opposite of each other (and would have to maintain them as such) or accept a
+single object which can be used to derive the info in both directions, which
+sounds preferable.
+
+If this works well, it can be further optimized by thinking about how to determine
+the values where a breakpoint is possible and only iterating those explicitly.
+There are ideas along this line in other versions as well as in this readme.
+I think it should be possible to determine this.
+
+Since this solution iterates viewport size, the final breakpoints should not
+need to be sorted before yielding because they should be guaranteed to be
+linear, from wider to narrower to zero. Table-based iteration would be jumpy
+based on the deadspace so _that_ would have to be sorted.

@@ -1,0 +1,20 @@
+<script>
+  const columns = [
+    { key: 1, ratio: 0.1, limit: 50, weight: 0 },
+    { key: 2, ratio: 0.2, limit: 50, weight: 3 },
+    { key: 3, ratio: 0.4, limit: 75, weight: 2 },
+    { key: 4, ratio: 0.3, limit: 100, weight: 1 }
+  ];
+
+  const breakpoint = viewport =>
+    viewport > 800 ? 200 : viewport < 400 ? 200 : 0;
+
+  for (let viewport = 1000; viewport > 0; viewport--) {
+    const table = viewport - breakpoint(viewport);
+    if (table <= 0) {
+      continue;
+    }
+
+    const columns = console.log(viewport, table);
+  }
+</script>
