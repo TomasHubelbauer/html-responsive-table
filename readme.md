@@ -541,7 +541,7 @@ approaches zero.
 - Calculate the fit size of the table
 - Calculate the fit size of the table removing the first lowest priority column
 
-## v6 Idea
+## Final? Idea
 
 Start with the same as v0 but instead of removing columns successively, start
 with an empty set and add them as long as they fit. Add them in a priority
@@ -576,39 +576,4 @@ doesn't have to be provided and the class name set on the head and body cells.
 
 Maybe this is the final algo:
 
-```js
-const columns = [...];
-
-// Sort the columns by priority so we slice from the single most important to progressively more numerous but less important
-const sortedColumns = [...columns].sort((a, b) => b.priority - a.priority);
-
-// Keep track of the last known fitting set of columns
-let visibleColumns = [];
-
-// Start from the single most important column alone
-let count = 1;
-do {
-  // Slice the available priority sorted columns to get the currently considered set
-  const candidateColumns = sortedColumns.slice(0, count);
-  
-  // Calculate the ratio sum of the considered columns to be able to normalize their ratios to one
-  const ratio = candidateColumns.reduce((a, c) => a + c.ratio, 0);
-
-  // Check if all columns fit given their limits and ratios and the current table size and stop if not
-  if (!candidateColumns.every(c => c.limit < tableSize * (c.ratio / ratio))) {
-    break;
-  }
-  
-  // Update the last known set of fitting columns to this current one
-  visibleColumns = candidateColumns;
-  
-  // Retry with an extended set in case it will also fit
-  count++;
-  
-  // Keep extending the considered set until we reach the full column set
-} while (count <= sortedColumns.length)
-
-// Derive the visibility state of each column based on the final set of fitting columns
-yield { viewportSize, tableSize, states: columns.map(column => ({ column, state: visibleColumns.includes(column) ? 'show' : 'hide' }) }
-```
-
+TODO: Finalize this (v6) and ditch the others.
