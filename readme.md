@@ -570,3 +570,6 @@ Since this solution iterates viewport size, the final breakpoints should not
 need to be sorted before yielding because they should be guaranteed to be
 linear, from wider to narrower to zero. Table-based iteration would be jumpy
 based on the deadspace so _that_ would have to be sorted.
+
+Also, use `style scoped` and instead of `key`, use `:nth-child` so that the key
+doesn't have to be provided and the class name set on the head and body cells.
