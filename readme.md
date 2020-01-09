@@ -577,3 +577,12 @@ doesn't have to be provided and the class name set on the head and body cells.
 Maybe this is the final algo:
 
 TODO: Finalize this (v6) and ditch the others.
+
+## To-Do
+
+### Clean the entire document to remove historical bits
+
+### Package the final version as an ESM module and host using GitHub Pages
+
+As to have a URL with the correct MIME. Add installation instructions to the
+readme.
